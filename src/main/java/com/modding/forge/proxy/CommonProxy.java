@@ -12,13 +12,13 @@ public class CommonProxy implements IProxy
 	{
 		
 	}
-
+	
 	@Override
 	public void init(FMLInitializationEvent event)
 	{
 		
 	}
-
+	
 	@Override
 	public void postInit(FMLPostInitializationEvent event)
 	{

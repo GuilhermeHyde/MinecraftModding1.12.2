@@ -1,5 +1,8 @@
 package com.modding.forge.proxy;
 
+import com.modding.forge.proxy.renders.BlockRendering;
+import com.modding.forge.proxy.renders.ItemRendering;
+
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -10,6 +13,8 @@ public class ClientProxy extends CommonProxy
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		super.preInit(event);
+		register(new ItemRendering());
+		register(new BlockRendering());
 	}
 	
 	@Override

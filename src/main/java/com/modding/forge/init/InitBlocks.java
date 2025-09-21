@@ -1,0 +1,45 @@
+package com.modding.forge.init;
+
+import com.modding.forge.Main;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraftforge.registries.IForgeRegistry;
+
+public class InitBlocks
+{
+	public static Block bronze_block, steel_block, titanium_block, adamantium_block;
+	public static Block[] listBlock = new Block[4];
+	public static Item[] listBlockItem = new Item[4];
+	public static int blockID;
+	
+	public static void initlaization()
+	{
+		bronze_block = register("bronze_block", new Block(Material.IRON)).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+		steel_block = register("steel_block", new Block(Material.IRON)).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+		adamantium_block = register("adamantium_block", new Block(Material.IRON)).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+		titanium_block = register("titanium_block", new Block(Material.IRON)).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+	}
+	
+	public static Block register(String name, Block block)
+	{
+		block.setUnlocalizedName(name);
+		listBlock[blockID] = block.setRegistryName(Main.location(name));
+		listBlockItem[blockID] = new ItemBlock(block).setRegistryName(Main.location(name));
+		blockID++;
+		return block;
+	}
+	
+	public static void registerBlock(IForgeRegistry<Block> event)
+	{
+		event.registerAll(listBlock);
+	}
+	
+	public static void registerBlockItem(IForgeRegistry<Item> event)
+	{
+		event.registerAll(listBlockItem);
+	}
+}

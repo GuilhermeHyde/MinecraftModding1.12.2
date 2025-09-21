@@ -1,7 +1,11 @@
 package com.modding.forge;
 
+import com.modding.forge.init.InitBlocks;
+import com.modding.forge.proxy.CommonProxy;
 import com.modding.forge.proxy.IProxy;
+import com.modding.forge.registry.ModRegistryEvent;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -25,6 +29,8 @@ public class Main
 	@EventHandler
 	public static void preInit(FMLPreInitializationEvent event)
 	{
+		InitBlocks.initlaization();
+		CommonProxy.register(new ModRegistryEvent());
 		proxy.preInit(event);
 	}
 	
@@ -38,5 +44,15 @@ public class Main
 	public static void postInit(FMLPostInitializationEvent event)
 	{
 		proxy.postInit(event);
+	}
+	
+	public static ResourceLocation location(String location)
+	{
+		return new ResourceLocation(Main.MODID + ":" + location);
+	}
+	
+	public static String modID()
+	{
+		return Main.MODID + ":";
 	}
 }
