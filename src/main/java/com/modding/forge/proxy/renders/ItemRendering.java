@@ -1,6 +1,6 @@
 package com.modding.forge.proxy.renders;
 
-import com.modding.forge.Main;
+import com.modding.forge.Reference;
 import com.modding.forge.init.InitItems;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -22,6 +22,6 @@ public class ItemRendering
 	
 	public static void register(Item item, int meta, String model)
 	{
-		ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(Main.modID() + model, "inventory"));
+		ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(Reference.modID() + model, "inventory"));
 	}
 }

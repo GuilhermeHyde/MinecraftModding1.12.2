@@ -1,6 +1,6 @@
 package com.modding.forge.init;
 
-import com.modding.forge.Main;
+import com.modding.forge.Reference;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -22,7 +22,7 @@ public class InitItems
 	public static Item register(String name, Item item)
 	{
 		item.setUnlocalizedName(name);
-		itemRegistry.register(item.setRegistryName(Main.location(name)));
+		itemRegistry.register(item.setRegistryName(Reference.location(name)));
 		return item;
 	}
 }

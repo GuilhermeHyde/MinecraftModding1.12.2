@@ -1,6 +1,6 @@
 package com.modding.forge.init;
 
-import com.modding.forge.Main;
+import com.modding.forge.Reference;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -27,8 +27,8 @@ public class InitBlocks
 	public static Block register(String name, Block block)
 	{
 		block.setUnlocalizedName(name);
-		listBlock[blockID] = block.setRegistryName(Main.location(name));
-		listBlockItem[blockID] = new ItemBlock(block).setRegistryName(Main.location(name));
+		listBlock[blockID] = block.setRegistryName(Reference.location(name));
+		listBlockItem[blockID] = new ItemBlock(block).setRegistryName(Reference.location(name));
 		blockID++;
 		return block;
 	}

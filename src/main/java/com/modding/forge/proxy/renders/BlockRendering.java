@@ -1,6 +1,6 @@
 package com.modding.forge.proxy.renders;
 
-import com.modding.forge.Main;
+import com.modding.forge.Reference;
 import com.modding.forge.init.InitBlocks;
 
 import net.minecraft.block.Block;
@@ -23,6 +23,6 @@ public class BlockRendering
 	
 	public static void register(Block block, int meta, String model)
 	{
-		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), meta, new ModelResourceLocation(Main.modID() + model, "inventory"));
+		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), meta, new ModelResourceLocation(Reference.modID() + model, "inventory"));
 	}
 }
