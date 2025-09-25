@@ -1,0 +1,21 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":
+	[
+		"#"
+	],
+	
+	"key":
+	{
+		"#":
+		{
+			"item": "elders_reborn:adamantium_block"
+		}
+	},
+	
+	"result":
+	{
+		"item": "elders_reborn:adamantium_ingot",
+		"count": 9	
+	}
+}

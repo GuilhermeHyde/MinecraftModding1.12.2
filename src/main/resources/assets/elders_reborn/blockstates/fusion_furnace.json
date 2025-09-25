@@ -1,0 +1,50 @@
+{
+	"variants":
+	{
+		"burning=false,facing=north":
+		{
+			"model": "elders_reborn:fusion_furnace"
+		},
+		
+		"burning=false,facing=south":
+		{
+			"model": "elders_reborn:fusion_furnace",
+			"y": 180
+		},
+		
+		"burning=false,facing=east":
+		{
+			"model": "elders_reborn:fusion_furnace",
+			"y": 90
+		},
+		
+		"burning=false,facing=west":
+		{
+			"model": "elders_reborn:fusion_furnace",
+			"y": 270
+		},
+		
+		"burning=true,facing=north":
+		{
+			"model": "elders_reborn:fusion_furnace_burn"
+		},
+
+		"burning=true,facing=south":
+		{
+			"model": "elders_reborn:fusion_furnace_burn",
+			"y": 180
+		},
+
+		"burning=true,facing=east":
+		{
+			"model": "elders_reborn:fusion_furnace_burn",
+			"y": 90
+		},
+
+		"burning=true,facing=west":
+		{
+			"model": "elders_reborn:fusion_furnace_burn",
+			"y": 270
+		}
+	}
+}

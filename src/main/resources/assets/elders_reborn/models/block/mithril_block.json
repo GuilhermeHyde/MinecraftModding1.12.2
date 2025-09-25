@@ -1,0 +1,7 @@
+{
+	"parent": "block/cube_all",
+	"textures":
+	{
+		"all": "elders_reborn:blocks/mithril_block"
+	}
+}

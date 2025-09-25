@@ -1,6 +1,7 @@
 package com.modding.forge.init;
 
 import com.modding.forge.Reference;
+import com.modding.forge.blocks.FusionFurnaceBlock;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -11,9 +12,11 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public class InitBlocks
 {
-	public static Block bronze_block, steel_block, titanium_block, adamantium_block;
-	public static Block[] listBlock = new Block[4];
-	public static Item[] listBlockItem = new Item[4];
+	public static Block bronze_block, steel_block, titanium_block, adamantium_block, tungsten_block, mithril_block,
+						fusion_furnace;
+	
+	public static Block[] listBlock = new Block[7];
+	public static Item[] listBlockItem = new Item[7];
 	public static int blockID;
 	
 	public static void initlaization()
@@ -22,6 +25,10 @@ public class InitBlocks
 		steel_block = register("steel_block", new Block(Material.IRON)).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
 		adamantium_block = register("adamantium_block", new Block(Material.IRON)).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
 		titanium_block = register("titanium_block", new Block(Material.IRON)).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+		tungsten_block = register("tungsten_block", new Block(Material.IRON)).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+		mithril_block = register("mithril_block", new Block(Material.IRON)).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+		
+		fusion_furnace = register("fusion_furnace", new FusionFurnaceBlock()).setCreativeTab(CreativeTabs.DECORATIONS);
 	}
 	
 	public static Block register(String name, Block block)

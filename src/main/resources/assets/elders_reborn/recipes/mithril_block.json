@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":
+	[
+		"###",
+		"###",
+		"###"
+	],
+	
+	"key":
+	{
+		"#":
+		{
+			"item": "elders_reborn:mithril_ingot"
+		}
+	},
+	
+	"result":
+	{
+		"item": "elders_reborn:mithril_block",
+		"count": 1
+	}
+}

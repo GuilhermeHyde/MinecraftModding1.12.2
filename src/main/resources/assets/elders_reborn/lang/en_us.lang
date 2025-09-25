@@ -3,9 +3,14 @@ item.bronze_ingot.name=Bronze Ingot
 item.steel_ingot.name=Steel Ingot
 item.titanium_ingot.name=Titanium Ingot
 item.adamantium_ingot.name=Adamantium Ingot
+item.tungsten_ingot.name=Tungsten Ingot
+item.mithril_ingot.name=Mithril Ingot
 
 #Blocks
 tile.bronze_block.name=Bronze Block
 tile.steel_block.name=Steel Block
 tile.titanium_block.name=Titanium Block
 tile.adamantium_block.name=Adamantium Block
+tile.tungsten_block.name=Tungsten Block
+tile.mithril_block.name=Mithril Block
+tile.fusion_furnace.name=Fusion Furnace

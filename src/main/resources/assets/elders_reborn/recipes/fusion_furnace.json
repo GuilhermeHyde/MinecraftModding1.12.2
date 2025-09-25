@@ -1,0 +1,33 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":
+	[
+		"###",
+		"#@#",
+		"&&&"
+	],
+	
+	"key":
+	{
+		"#":
+		{
+			"item": "minecraft:iron_block"
+		},
+		
+		"@":
+		{
+			"item": "minecraft:furnace"
+		},
+		
+		"&":
+		{
+			"item": "minecraft:obsidian"
+		}
+	},
+	
+	"result":
+	{
+		"item": "elders_reborn:fusion_furnace",
+		"count": 1
+	}
+}

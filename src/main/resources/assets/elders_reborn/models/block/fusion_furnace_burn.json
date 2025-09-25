@@ -1,0 +1,13 @@
+{
+	"parent": "block/orientable",
+	"textures":
+	{
+		"particle": "elders_reborn:blocks/fusion_furnace_burn",
+		"up": "elders_reborn:blocks/fusion_furnace_top",
+		"down": "elders_reborn:blocks/fusion_furnace_bottom",
+		"north": "elders_reborn:blocks/fusion_furnace_burn",
+		"south": "elders_reborn:blocks/fusion_furnace_side",
+		"east": "elders_reborn:blocks/fusion_furnace_side",
+		"west": "elders_reborn:blocks/fusion_furnace_side"
+	}
+}

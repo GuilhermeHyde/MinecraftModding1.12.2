@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":
+	[
+		"###",	
+		"###",
+		"###"
+	],
+	
+	"key":
+	{
+		"#":
+		{
+			"item": "elders_reborn:bronze_ingot"
+		}
+	},
+	
+	"result":
+	{
+		"item": "elders_reborn:bronze_block",
+		"count": 1
+	}
+}

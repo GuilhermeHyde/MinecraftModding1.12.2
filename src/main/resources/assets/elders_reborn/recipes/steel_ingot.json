@@ -1,0 +1,21 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":
+	[
+		"#"
+	],
+	
+	"key":
+	{
+		"#":
+		{
+			"item": "elders_reborn:steel_block"
+		}
+	},
+	
+	"result":
+	{
+		"item": "elders_reborn:steel_ingot",
+		"count": 9	
+	}
+}

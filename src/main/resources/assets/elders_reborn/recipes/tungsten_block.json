@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern":
+	[
+		"###",
+		"###",
+		"###"
+	],
+	
+	"key":
+	{
+		"#":
+		{
+			"item": "elders_reborn:tungsten_ingot"
+		}
+	},
+	
+	"result":
+	{
+		"item": "elders_reborn:tungsten_block",
+		"count": 1
+	}
+}

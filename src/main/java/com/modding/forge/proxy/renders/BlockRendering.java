@@ -19,6 +19,9 @@ public class BlockRendering
 		register(InitBlocks.steel_block, 0, "steel_block");
 		register(InitBlocks.titanium_block, 0, "titanium_block");
 		register(InitBlocks.adamantium_block, 0, "adamantium_block");
+		register(InitBlocks.tungsten_block, 0, "tungsten_block");
+		register(InitBlocks.mithril_block, 0, "mithril_block");
+		register(InitBlocks.fusion_furnace, 0, "fusion_furnace");
 	}
 	
 	public static void register(Block block, int meta, String model)
