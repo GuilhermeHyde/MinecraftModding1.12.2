@@ -21,6 +21,7 @@ public class BlockRendering
 		register(InitBlocks.adamantium_block, 0, "adamantium_block");
 		register(InitBlocks.tungsten_block, 0, "tungsten_block");
 		register(InitBlocks.mithril_block, 0, "mithril_block");
+		register(InitBlocks.orichalcum_block, 0, "orichalcum_block");
 		register(InitBlocks.fusion_furnace, 0, "fusion_furnace");
 	}
 	

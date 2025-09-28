@@ -20,6 +20,7 @@ public class ItemRendering
 		register(InitItems.adamantium_ingot, 0, "adamantium_ingot");
 		register(InitItems.tungsten_ingot, 0, "tungsten_ingot");
 		register(InitItems.mithril_ingot, 0, "mithril_ingot");
+		register(InitItems.orichalcum_ingot, 0, "orichalcum_ingot");
 	}
 	
 	public static void register(Item item, int meta, String model)
