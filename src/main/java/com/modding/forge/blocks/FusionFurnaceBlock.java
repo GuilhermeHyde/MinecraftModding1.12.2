@@ -4,9 +4,10 @@ import java.util.Random;
 
 import com.modding.forge.Main;
 import com.modding.forge.Reference;
+import com.modding.forge.blocks.tilentities.TileEntityFusionFurnace;
 import com.modding.forge.init.InitBlocks;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -27,7 +28,7 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class FusionFurnaceBlock extends Block
+public class FusionFurnaceBlock extends BlockContainer
 {
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
 	public static final PropertyBool BURNING = PropertyBool.create("burning");
@@ -105,6 +106,12 @@ public class FusionFurnaceBlock extends Block
 	public boolean hasTileEntity(IBlockState state)
 	{
 		return true;
+	}
+	
+	@Override
+	public TileEntity createNewTileEntity(World world, int meta)
+	{
+		return new TileEntityFusionFurnace();
 	}
 	
 	@Override
