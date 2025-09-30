@@ -11,7 +11,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class FusionFurnaceGui extends GuiContainer
 {
-	private static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID + ":textures/gui/fusion_furnace_gui");
+	private static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID + ":textures/gui/fusion_furnace_gui.png");
 	private final InventoryPlayer player;
 	private final TileEntityFusionFurnace tileEntity;
 	

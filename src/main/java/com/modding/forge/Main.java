@@ -5,6 +5,7 @@ import com.modding.forge.proxy.CommonProxy;
 import com.modding.forge.proxy.IProxy;
 import com.modding.forge.registry.GuiHandler;
 import com.modding.forge.registry.ModRegistryEvent;
+import com.modding.forge.registry.TileEntityRegistry;
 
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -28,6 +29,7 @@ public class Main
 	public static void preInit(FMLPreInitializationEvent event)
 	{
 		InitBlocks.initlaization();
+		TileEntityRegistry.register();
 		CommonProxy.register(new ModRegistryEvent());
 		proxy.preInit(event);
 	}

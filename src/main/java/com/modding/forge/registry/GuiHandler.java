@@ -2,6 +2,7 @@ package com.modding.forge.registry;
 
 import com.modding.forge.Reference;
 import com.modding.forge.blocks.containers.ContainerFusionFurnace;
+import com.modding.forge.blocks.gui.FusionFurnaceGui;
 import com.modding.forge.blocks.tilentities.TileEntityFusionFurnace;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,7 +22,7 @@ public class GuiHandler implements IGuiHandler
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
 	{
-		if(ID == Reference.FUSION_FURNACE_GUI) return new ContainerFusionFurnace(player.inventory, (TileEntityFusionFurnace)world.getTileEntity(new BlockPos(x, y, z)));
+		if(ID == Reference.FUSION_FURNACE_GUI) return new FusionFurnaceGui(player.inventory, (TileEntityFusionFurnace)world.getTileEntity(new BlockPos(x, y, z)));
 		return null;
 	}
 }
