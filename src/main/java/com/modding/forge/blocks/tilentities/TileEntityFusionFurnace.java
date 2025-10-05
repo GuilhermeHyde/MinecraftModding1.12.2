@@ -105,67 +105,64 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 	@Override
 	public void update()
 	{
-		if(isHeating())
-		{
-			FusionFurnaceBlock.setState(true, world, pos);
-		}
-		
-		ItemStack[] inputs = new ItemStack[] {handler.getStackInSlot(0), handler.getStackInSlot(1)};
+		ItemStack[] input = new ItemStack[] {this.handler.getStackInSlot(0), this.handler.getStackInSlot(1)};
 		ItemStack fuel = this.handler.getStackInSlot(2);
 		
-		if(isHeating() || !fuel.isEmpty() && !this.handler.getStackInSlot(0).isEmpty() || this.handler.getStackInSlot(1).isEmpty())
+		if(this.isHeating()) FusionFurnaceBlock.setState(true, world, pos);
+		
+		if(this.heat < 2000)
 		{
-			if(!isHeating() && canSmelt())
+			if(this.isHeating() && !fuel.isEmpty())
 			{
-				this.heat = getItemBurnTime(fuel);
+				Item item = fuel.getItem();
+				fuel.shrink(1);
 				
-				if(isHeating() && !fuel.isEmpty())
+				if(fuel.isEmpty())
 				{
-					Item item = fuel.getItem();
-					fuel.shrink(1);
-					
-					if(fuel.isEmpty())
-					{
-						ItemStack item1 = item.getContainerItem(fuel);
-						this.handler.setStackInSlot(2, item1);
-					}
+					ItemStack item1 = item.getContainerItem(fuel);
+					this.handler.setStackInSlot(2, item1);
 				}
 			}
+			this.heat += getItemBurnTime(fuel);
 		}
 		
-		if(isHeating() && canSmelt())
+		if(this.isHeating() && this.canSmelt())
 		{
-			this.meltingProcess++;
-			if(this.meltingProcess >= 8)
+			this.meltingProcess += 1;
+			this.maxMelting = 200;
+			this.maxCasting = 8;
+			
+			if(this.meltingProcess == this.maxMelting)
 			{
-				--this.heat;
+				this.castingProcess += 1;
 				this.meltingProcess = 0;
-				this.castingProcess++;
 			}
 			
-			if(this.castingProcess >= 8)
+			if(this.castingProcess == this.maxCasting)
 			{
-				if(handler.getStackInSlot(3).getCount() > 0) handler.getStackInSlot(3).grow(1);
-				else handler.insertItem(3, this.smelting, false);
-				this.smelting = ItemStack.EMPTY;
-				this.castingProcess = 0;
-				return;
-			}
-		}
-		else
-		{
-			if(isHeating() && canSmelt())
-			{
-				ItemStack output = FusionFurnaceRecipe.getInstance().getRecipesResult(handler.getStackInSlot(0), handler.getStackInSlot(1));
+				if(this.handler.getStackInSlot(3).getCount() > 0)
+				{
+					this.handler.getStackInSlot(3).grow(1);
+				}
+				else
+				{
+					this.handler.insertItem(3, smelting, false);
+				}
+				
+				ItemStack output = FusionFurnaceRecipe.getInstance().getRecipesResult(input[0], input[1], this.getField(4));
 				if(!output.isEmpty())
 				{
 					this.smelting = output;
-					meltingProcess++;
-					inputs[0].shrink(1);
-					inputs[1].shrink(1);
-					handler.setStackInSlot(0, inputs[0]);
-					handler.setStackInSlot(1, inputs[1]);
+					this.meltingProcess++;
+					input[0].shrink(1);
+					input[1].shrink(1);
+					this.handler.setStackInSlot(0, input[0]);
+					this.handler.setStackInSlot(1, input[1]);
 				}
+				
+				this.smelting = ItemStack.EMPTY;
+				this.castingProcess = 0;
+				this.heat -= 50;
 			}
 		}
 	}
@@ -175,12 +172,12 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		if(((ItemStack)this.handler.getStackInSlot(0)).isEmpty() || ((ItemStack)this.handler.getStackInSlot(1)).isEmpty()) return false;
 		else
 		{
-			ItemStack result = FusionFurnaceRecipe.getInstance().getRecipesResult((ItemStack)this.handler.getStackInSlot(0), (ItemStack)this.handler.getStackInSlot(1));
+			ItemStack result = FusionFurnaceRecipe.getInstance().getRecipesResult((ItemStack)this.handler.getStackInSlot(0), (ItemStack)this.handler.getStackInSlot(1), this.getField(4));
 			if(result.isEmpty()) return false;
 			else
 			{
 				ItemStack output = (ItemStack)this.handler.getStackInSlot(3);
-				if(output.isEmpty()) return false;
+				if(output.isEmpty()) return true;
 				if(!output.isItemEqual(result)) return false;
 				int res = output.getCount() + result.getCount();
 				return res <= 64 && res <= output.getMaxStackSize();
@@ -208,7 +205,7 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			if (item instanceof ItemSword && "WOOD".equals(((ItemSword)item).getToolMaterialName())) return 200;
 			if (item instanceof ItemHoe && "WOOD".equals(((ItemHoe)item).getMaterialName())) return 200;
 			if (item == Items.STICK) return 100;
-			if (item == Items.COAL) return 1600;
+			if (item == Items.COAL) return 160;
 			if (item == Items.LAVA_BUCKET) return 20000;
 			if (item == Item.getItemFromBlock(Blocks.SAPLING)) return 100;
 			if (item == Items.BLAZE_ROD) return 2400;

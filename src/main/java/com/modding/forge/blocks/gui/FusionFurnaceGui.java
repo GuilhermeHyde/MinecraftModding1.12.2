@@ -39,25 +39,35 @@ public class FusionFurnaceGui extends GuiContainer
 		
 		if(TileEntityFusionFurnace.isHeating(tileEntity))
 		{
-			int k = this.getBurnLeftScaled(13);
-			this.drawTexturedModalRect(this.guiLeft + 8, this.guiTop + 54 + 12 - k, 176, 12 - k, 14, k + 1);
+			int j = this.getHeatingBarScaled(24);
+			this.drawTexturedModalRect(this.guiLeft + 44, this.guiTop + 52, 3, 167, j + 1, 18);
 		}
 		
+		int k = this.getBurnLeftScaled(13);
+		this.drawTexturedModalRect(this.guiLeft + 52, this.guiTop + 26 + 13 - k, 176, 13 - k, 14, k + 1);
+		
 		int l = this.getCookProgressScaled(24);
-		this.drawTexturedModalRect(this.guiLeft + 44, this.guiTop + 36, 176, 14, l + 1, 16);
+		this.drawTexturedModalRect(this.guiLeft + 94, this.guiTop + 26, 176, 14, l + 1, 16);
 	}
 	
+	private int getHeatingBarScaled(int pixels)
+	{
+		int i = this.tileEntity.getField(4);
+		int j = 2000 / 118 * pixels;
+		return j != 0 && i != 0 ? i * pixels / j : 0;
+	}
+
 	private int getBurnLeftScaled(int pixels)
 	{
-		int i = this.tileEntity.getField(1);
+		int i = this.tileEntity.getField(3);
 		if(i == 0) i = 200;
-		return this.tileEntity.getField(0) * pixels / i;
+		return this.tileEntity.getField(1) * pixels / i;
 	}
 	
 	private int getCookProgressScaled(int pixels)
 	{
-		int i = this.tileEntity.getField(2);
-		int j = this.tileEntity.getField(3);
+		int i = this.tileEntity.getField(0);
+		int j = this.tileEntity.getField(2);
 		return j != 0 && i != 0 ? i * pixels / j : 0;
 	}
 }

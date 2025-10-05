@@ -15,6 +15,7 @@ public class FusionFurnaceRecipe
 {
 	private static final FusionFurnaceRecipe INSTANCE = new FusionFurnaceRecipe();
 	private final Table<ItemStack, ItemStack, ItemStack> recipesList = HashBasedTable.<ItemStack, ItemStack, ItemStack>create();
+	private final Map<ItemStack, Integer> heatList = Maps.<ItemStack, Integer>newHashMap();
 	private final Map<ItemStack, Float> experienceList = Maps.<ItemStack, Float>newHashMap();
 	
 	public static FusionFurnaceRecipe getInstance()
@@ -24,43 +25,44 @@ public class FusionFurnaceRecipe
 	
 	private FusionFurnaceRecipe()
 	{
-		addFusionRecipes(new ItemStack(Items.IRON_INGOT), new ItemStack(Items.GOLD_INGOT), new ItemStack(InitItems.bronze_ingot), 1.0F);
-		addFusionRecipes(new ItemStack(Items.IRON_INGOT), new ItemStack(Items.COAL), new ItemStack(InitItems.steel_ingot), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.steel_ingot), new ItemStack(InitItems.bronze_ingot), new ItemStack(InitItems.titanium_ingot), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.titanium_ingot), new ItemStack(Items.BLAZE_POWDER), new ItemStack(InitItems.tungsten_ingot), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.titanium_ingot), new ItemStack(Items.MAGMA_CREAM), new ItemStack(InitItems.orichalcum_ingot), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.tungsten_ingot), new ItemStack(Items.CHORUS_FRUIT_POPPED), new ItemStack(InitItems.adamantium_ingot), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.orichalcum_ingot), new ItemStack(Items.CHORUS_FRUIT_POPPED), new ItemStack(InitItems.mithril_ingot), 1.0F);
+		addFusionRecipes(new ItemStack(Items.IRON_INGOT), new ItemStack(Items.GOLD_INGOT), 1000, new ItemStack(InitItems.bronze_ingot), 1.0F);
+		addFusionRecipes(new ItemStack(Items.IRON_INGOT), new ItemStack(Items.COAL), 1530, new ItemStack(InitItems.steel_ingot), 1.0F);
+		addFusionRecipes(new ItemStack(InitItems.steel_ingot), new ItemStack(InitItems.bronze_ingot), 1725, new ItemStack(InitItems.titanium_ingot), 1.0F);
+		addFusionRecipes(new ItemStack(InitItems.titanium_ingot), new ItemStack(Items.BLAZE_POWDER), 3422, new ItemStack(InitItems.tungsten_ingot), 1.0F);
+		addFusionRecipes(new ItemStack(InitItems.titanium_ingot), new ItemStack(Items.MAGMA_CREAM), 3880, new ItemStack(InitItems.orichalcum_ingot), 1.0F);
+		addFusionRecipes(new ItemStack(InitItems.tungsten_ingot), new ItemStack(Items.CHORUS_FRUIT_POPPED), 5000, new ItemStack(InitItems.adamantium_ingot), 1.0F);
+		addFusionRecipes(new ItemStack(InitItems.orichalcum_ingot), new ItemStack(Items.CHORUS_FRUIT_POPPED), 4875, new ItemStack(InitItems.mithril_ingot), 1.0F);
 	}
 	
-	private void addFusionRecipes(ItemStack input1, ItemStack input2, ItemStack result, float exp)
+	private void addFusionRecipes(ItemStack input1, ItemStack input2, int heat, ItemStack result, float exp)
 	{
-		if(getRecipesResult(input1, input2) != ItemStack.EMPTY) return;
+		if(getRecipesResult(input1, input2, heat) != ItemStack.EMPTY) return;
 		this.recipesList.put(input1, input2, result);
+		this.heatList.put(result, Integer.valueOf(heat));
 		this.experienceList.put(result, Float.valueOf(exp));
 	}
 	
-	public ItemStack getRecipesResult(ItemStack input1, ItemStack input2)
+	public ItemStack getRecipesResult(ItemStack input1, ItemStack input2, int heat)
 	{
-		for(Entry<ItemStack, Map<ItemStack, ItemStack>> recipe : recipesList.columnMap().entrySet())
+		for(Entry<ItemStack, Map<ItemStack, ItemStack>> recipe : recipesList.rowMap().entrySet())
 		{
-			if(compareItemStack(input1, (ItemStack)recipe.getKey()))
+			for(Entry<ItemStack, Integer> value : heatList.entrySet())
 			{
-				for(Entry<ItemStack, ItemStack> entry : recipe.getValue().entrySet())
+				if(heat >= value.getValue())
 				{
-					if(compareItemStack(input2, (ItemStack)entry.getKey()))
+					if(this.compareItemStack(input1, (ItemStack)recipe.getKey()))
 					{
-						return (ItemStack)entry.getValue();
+						for(Entry<ItemStack, ItemStack> entry : recipe.getValue().entrySet())
+						{
+							if(this.compareItemStack(input2, entry.getKey())) return entry.getKey();
+						}
 					}
-				}
-			}
-			else if(compareItemStack(input2, (ItemStack)recipe.getKey()))
-			{
-				for(Entry<ItemStack, ItemStack> entry : recipe.getValue().entrySet())
-				{
-					if(compareItemStack(input1, (ItemStack)entry.getKey()))
+					else if(this.compareItemStack(input2, (ItemStack)recipe.getKey()))
 					{
-						return (ItemStack)entry.getValue();
+						for(Entry<ItemStack, ItemStack> entry : recipe.getValue().entrySet())
+						{
+							if(this.compareItemStack(input1, entry.getKey())) return entry.getKey();
+						}
 					}
 				}
 			}
@@ -68,10 +70,8 @@ public class FusionFurnaceRecipe
 		return ItemStack.EMPTY;
 	}
 	
-	private boolean compareItemStack(ItemStack input1, ItemStack input2)
+	private boolean compareItemStack(ItemStack input1, ItemStack key1)
 	{
-		return input2.getItem() == input1.getItem() && (input2.getMetadata() == 32767 || input2.getMetadata() == input1.getMetadata());
+		return key1.getItem() == input1.getItem() && (key1.getMetadata() == 32767 || key1.getMetadata() == input1.getMetadata());
 	}
-	
-	
 }
