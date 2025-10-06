@@ -26,8 +26,10 @@ public class FusionFurnaceGui extends GuiContainer
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
 		String tileName = this.tileEntity.getDisplayName().getUnformattedText();
+		int value = this.tileEntity.getField(4);
 		this.fontRenderer.drawString(tileName, (this.xSize / 2 - this.fontRenderer.getStringWidth(tileName) / 2) + 3, 8, 4210752);
 		this.fontRenderer.drawString(this.player.getDisplayName().getUnformattedText(), 112, this.ySize - 96 + 2, 4210752);
+		this.fontRenderer.drawString(value + "°C", 45, 72, 4210752);
 	}
 
 	@Override
@@ -44,16 +46,17 @@ public class FusionFurnaceGui extends GuiContainer
 		}
 		
 		int k = this.getBurnLeftScaled(13);
-		this.drawTexturedModalRect(this.guiLeft + 52, this.guiTop + 26 + 13 - k, 176, 13 - k, 14, k + 1);
+		this.drawTexturedModalRect(this.guiLeft + 51, this.guiTop + 26 + 13 - k, 176, 13 - k, 14, k + 1);
 		
 		int l = this.getCookProgressScaled(24);
-		this.drawTexturedModalRect(this.guiLeft + 94, this.guiTop + 26, 176, 14, l + 1, 16);
+		this.drawTexturedModalRect(this.guiLeft + 93, this.guiTop + 24, 176, 14, l + 1, 16);
 	}
 	
 	private int getHeatingBarScaled(int pixels)
 	{
 		int i = this.tileEntity.getField(4);
-		int j = 2000 / 118 * pixels;
+		int j = this.tileEntity.getField(5);
+		j = j / 118 * pixels;
 		return j != 0 && i != 0 ? i * pixels / j : 0;
 	}
 

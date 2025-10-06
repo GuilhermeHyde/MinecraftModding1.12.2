@@ -14,6 +14,7 @@ public class ModRegistryEvent
 	public void onRegisterBlockEvent(RegistryEvent.Register<Block> event)
 	{
 		InitBlocks.registerBlock(event.getRegistry());
+		TileEntityRegistry.register();
 	}
 	
 	@SubscribeEvent

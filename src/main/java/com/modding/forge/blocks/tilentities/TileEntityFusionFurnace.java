@@ -1,5 +1,7 @@
 package com.modding.forge.blocks.tilentities;
 
+import javax.annotation.Nonnull;
+
 import com.modding.forge.blocks.FusionFurnaceBlock;
 import com.modding.forge.blocks.recipes.FusionFurnaceRecipe;
 
@@ -30,8 +32,27 @@ import net.minecraftforge.items.ItemStackHandler;
 
 public class TileEntityFusionFurnace extends TileEntity implements ITickable
 {
-	private ItemStackHandler handler = new ItemStackHandler(4);
-	private int heat, castingProcess, meltingProcess, maxCasting, maxMelting;
+	public final ItemStackHandler handler = new ItemStackHandler(4)
+	{
+		@Override
+		public boolean isItemValid(int slot, @Nonnull ItemStack stack)
+		{
+			switch(slot)
+			{
+			case 0:
+				return true;
+			case 1:
+				return true;
+			case 2:
+				return isItemFuel(stack);
+			case 3:
+				return false;
+				default:
+					return false;
+			}
+		}
+	};
+	private int heat, maxHeat = 2000, castingProcess, meltingProcess, maxCasting = 8, maxMelting = 200;
 	private String tileEntityName;
 	private ItemStack smelting = ItemStack.EMPTY;
 	
@@ -70,11 +91,12 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 	{
 		super.readFromNBT(compound);
 		this.handler.deserializeNBT(compound.getCompoundTag("Inventory"));
+		this.heat = compound.getInteger("Heat");
 		this.meltingProcess = compound.getInteger("MeltingProcess");
 		this.castingProcess = compound.getInteger("CastingProcess");
 		this.maxMelting = compound.getInteger("MaxMelting");
 		this.maxCasting = compound.getInteger("MaxCasting");
-		this.heat = getItemBurnTime((ItemStack)this.handler.getStackInSlot(2));
+		this.maxHeat = compound.getInteger("MaxHeat");
 		if(compound.hasKey("CustomName", 8)) setName(compound.getString("CustomName"));
 	}
 
@@ -83,10 +105,12 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 	{
 		super.writeToNBT(compound);
 		compound.setTag("Inventory", this.handler.serializeNBT());
-		compound.setInteger("MeltingProcess", (short)this.meltingProcess);
-		compound.setInteger("CastingProcess", (short)this.castingProcess);
-		compound.setInteger("MaxMelting", (short)this.maxMelting);
-		compound.setInteger("MaxCasting", (short)this.maxCasting);
+		compound.setInteger("Heat", this.heat);
+		compound.setInteger("MeltingProcess", this.meltingProcess);
+		compound.setInteger("CastingProcess", this.castingProcess);
+		compound.setInteger("MaxMelting", this.maxMelting);
+		compound.setInteger("MaxCasting", this.maxCasting);
+		compound.setInteger("MaxHeat", this.maxHeat);
 		if(this.hasCustomName()) compound.setString("CustomName", this.tileEntityName);
 		return compound;
 	}
@@ -108,62 +132,78 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		ItemStack[] input = new ItemStack[] {this.handler.getStackInSlot(0), this.handler.getStackInSlot(1)};
 		ItemStack fuel = this.handler.getStackInSlot(2);
 		
-		if(this.isHeating()) FusionFurnaceBlock.setState(true, world, pos);
-		
-		if(this.heat < 2000)
+		if(this.isHeating())
 		{
-			if(this.isHeating() && !fuel.isEmpty())
+			this.markDirty();
+			FusionFurnaceBlock.setState(true, world, pos);
+		}
+		
+		if(this.heat >= this.maxHeat) this.heat = this.maxHeat;
+		else if (this.heat < 0) this.heat = 0;
+		
+		if(this.heat < this.maxHeat)
+		{
+			Item item = fuel.getItem();
+			
+			if(getItemBurnTime(fuel) > 0)
 			{
-				Item item = fuel.getItem();
+				this.heat += getItemBurnTime(fuel);
 				fuel.shrink(1);
+				this.markDirty();
 				
 				if(fuel.isEmpty())
 				{
 					ItemStack item1 = item.getContainerItem(fuel);
 					this.handler.setStackInSlot(2, item1);
 				}
+				
+				if(fuel.getItem() == Items.LAVA_BUCKET) this.handler.setStackInSlot(2, new ItemStack(Items.BUCKET));
 			}
-			this.heat += getItemBurnTime(fuel);
 		}
 		
 		if(this.isHeating() && this.canSmelt())
 		{
 			this.meltingProcess += 1;
-			this.maxMelting = 200;
-			this.maxCasting = 8;
 			
 			if(this.meltingProcess == this.maxMelting)
 			{
 				this.castingProcess += 1;
 				this.meltingProcess = 0;
+				this.markDirty();
 			}
 			
 			if(this.castingProcess == this.maxCasting)
 			{
-				if(this.handler.getStackInSlot(3).getCount() > 0)
-				{
-					this.handler.getStackInSlot(3).grow(1);
-				}
-				else
-				{
-					this.handler.insertItem(3, smelting, false);
-				}
-				
 				ItemStack output = FusionFurnaceRecipe.getInstance().getRecipesResult(input[0], input[1], this.getField(4));
 				if(!output.isEmpty())
 				{
 					this.smelting = output;
-					this.meltingProcess++;
 					input[0].shrink(1);
 					input[1].shrink(1);
 					this.handler.setStackInSlot(0, input[0]);
 					this.handler.setStackInSlot(1, input[1]);
 				}
 				
+				if(this.handler.getStackInSlot(3).getCount() > 0)
+				{
+					this.handler.getStackInSlot(3).grow(1);
+				}
+				else
+				{
+					this.handler.insertItem(3, this.smelting, false);
+				}
+				
 				this.smelting = ItemStack.EMPTY;
 				this.castingProcess = 0;
-				this.heat -= 50;
+				this.heat -= 100;
+				this.markDirty();
+				return;
 			}
+		}
+		else
+		{
+			this.meltingProcess = 0;
+			this.castingProcess = 0;
 		}
 	}
 	
@@ -196,19 +236,19 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			{
 				Block block = Block.getBlockFromItem(item);
 
-				if (block == Blocks.WOODEN_SLAB) return 150;
-				if (block.getDefaultState().getMaterial() == Material.WOOD) return 300;
-				if (block == Blocks.COAL_BLOCK) return 16000;
+				if (block == Blocks.WOODEN_SLAB) return 15;
+				if (block.getDefaultState().getMaterial() == Material.WOOD) return 15;
+				if (block == Blocks.COAL_BLOCK) return 100;
 			}
 
-			if (item instanceof ItemTool && "WOOD".equals(((ItemTool)item).getToolMaterialName())) return 200;
-			if (item instanceof ItemSword && "WOOD".equals(((ItemSword)item).getToolMaterialName())) return 200;
-			if (item instanceof ItemHoe && "WOOD".equals(((ItemHoe)item).getMaterialName())) return 200;
-			if (item == Items.STICK) return 100;
-			if (item == Items.COAL) return 160;
-			if (item == Items.LAVA_BUCKET) return 20000;
-			if (item == Item.getItemFromBlock(Blocks.SAPLING)) return 100;
-			if (item == Items.BLAZE_ROD) return 2400;
+			if (item instanceof ItemTool && "WOOD".equals(((ItemTool)item).getToolMaterialName())) return 5;
+			if (item instanceof ItemSword && "WOOD".equals(((ItemSword)item).getToolMaterialName())) return 5;
+			if (item instanceof ItemHoe && "WOOD".equals(((ItemHoe)item).getMaterialName())) return 5;
+			if (item == Items.STICK) return 5;
+			if (item == Items.COAL) return 25;
+			if (item == Items.LAVA_BUCKET) return 500;
+			if (item == Item.getItemFromBlock(Blocks.SAPLING)) return 5;
+			if (item == Items.BLAZE_ROD) return 750;
 
 			return ForgeEventFactory.getItemBurnTime(fuel);
 		}
@@ -238,6 +278,8 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			return this.maxMelting;
 		case 4:
 			return this.heat;
+		case 5:
+			return this.maxHeat;
 		default:
 			return 0;
 		}
@@ -261,6 +303,9 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			break;
 		case 4:
 			this.heat = value;
+			break;
+		case 5:
+			this.maxHeat = value;
 			break;
 		}
 	}

@@ -54,14 +54,14 @@ public class FusionFurnaceRecipe
 					{
 						for(Entry<ItemStack, ItemStack> entry : recipe.getValue().entrySet())
 						{
-							if(this.compareItemStack(input2, entry.getKey())) return entry.getKey();
+							if(this.compareItemStack(input2, entry.getKey())) return entry.getValue();
 						}
 					}
 					else if(this.compareItemStack(input2, (ItemStack)recipe.getKey()))
 					{
 						for(Entry<ItemStack, ItemStack> entry : recipe.getValue().entrySet())
 						{
-							if(this.compareItemStack(input1, entry.getKey())) return entry.getKey();
+							if(this.compareItemStack(input1, entry.getKey())) return entry.getValue();
 						}
 					}
 				}
