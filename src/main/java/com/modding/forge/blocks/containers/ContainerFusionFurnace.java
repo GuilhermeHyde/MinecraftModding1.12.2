@@ -112,9 +112,15 @@ public class ContainerFusionFurnace extends Container
 						{
 							if(!this.mergeItemStack(stack1, 0, 2, false)) return ItemStack.EMPTY;
 						}
-						else if(TileEntityFusionFurnace.isItemFuel(stack1) && this.inventorySlots.get(2).getStack().getCount() < 64)
+						else if(TileEntityFusionFurnace.isItemFuel(stack1))
 						{
-							if(!this.mergeItemStack(stack1, 2, 3, false)) return ItemStack.EMPTY;
+							boolean isEntry = FusionFurnaceRecipe.getInstance().compareItemStack(stack1, entry.getKey()) || FusionFurnaceRecipe.getInstance().compareItemStack(stack1, entry1.getKey());
+							
+							if(!isEntry && this.inventorySlots.get(2).getStack().getCount() >= 64)
+							{
+								if(!this.mergeItemStack(stack1, 0, 2, false)) return ItemStack.EMPTY;
+							}
+							else if(!this.mergeItemStack(stack1, 2, 3, false)) return ItemStack.EMPTY;
 						}
 						else if(index >= 4 && index < 31)
 						{
@@ -127,19 +133,11 @@ public class ContainerFusionFurnace extends Container
 					}
 				}
 			}
-			else if(!this.mergeItemStack(stack1, 4, 40, false)) 
-			{
-				return ItemStack.EMPTY;
-			}
-			if(stack1.isEmpty())
-			{
-				slot.putStack(ItemStack.EMPTY);
-			}
-			else
-			{
-				slot.onSlotChanged();
-
-			}
+			else if(!this.mergeItemStack(stack1, 4, 40, false)) return ItemStack.EMPTY;
+			
+			if(stack1.isEmpty()) slot.putStack(ItemStack.EMPTY);
+			else slot.onSlotChanged();
+			
 			if(stack1.getCount() == stack.getCount()) return ItemStack.EMPTY;
 			slot.onTake(player, stack1);
 		}
