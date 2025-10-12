@@ -134,7 +134,6 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		
 		if(this.isHeating())
 		{
-			this.markDirty();
 			FusionFurnaceBlock.setState(true, world, pos);
 		}
 		
@@ -149,7 +148,6 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			{
 				this.heat += getItemBurnTime(fuel);
 				fuel.shrink(1);
-				this.markDirty();
 				
 				if(fuel.isEmpty())
 				{
@@ -169,7 +167,6 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			{
 				this.castingProcess += 1;
 				this.meltingProcess = 0;
-				this.markDirty();
 			}
 			
 			if(this.castingProcess == this.maxCasting)
@@ -196,7 +193,6 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 				this.smelting = ItemStack.EMPTY;
 				this.castingProcess = 0;
 				this.heat -= 100;
-				this.markDirty();
 				return;
 			}
 		}
@@ -205,6 +201,8 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			this.meltingProcess = 0;
 			this.castingProcess = 0;
 		}
+		
+		this.markDirty();
 	}
 	
 	private boolean canSmelt()

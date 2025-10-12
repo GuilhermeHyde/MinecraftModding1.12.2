@@ -46,23 +46,19 @@ public class FusionFurnaceRecipe
 	{
 		for(Entry<ItemStack, Map<ItemStack, ItemStack>> recipe : recipesList.rowMap().entrySet())
 		{
-			for(Entry<ItemStack, Integer> value : heatList.entrySet())
+			for(Entry<ItemStack, ItemStack> entry : recipe.getValue().entrySet())
 			{
-				if(heat >= value.getValue())
+				for(Entry<ItemStack, Integer> value : heatList.entrySet())
 				{
+					boolean flag = heat >= value.getValue();
+					
 					if(this.compareItemStack(input1, (ItemStack)recipe.getKey()))
 					{
-						for(Entry<ItemStack, ItemStack> entry : recipe.getValue().entrySet())
-						{
-							if(this.compareItemStack(input2, entry.getKey())) return entry.getValue();
-						}
+						if(this.compareItemStack(input2, entry.getKey()) && flag) return entry.getValue();
 					}
 					else if(this.compareItemStack(input2, (ItemStack)recipe.getKey()))
 					{
-						for(Entry<ItemStack, ItemStack> entry : recipe.getValue().entrySet())
-						{
-							if(this.compareItemStack(input1, entry.getKey())) return entry.getValue();
-						}
+						if(this.compareItemStack(input1, entry.getKey()) && flag) return entry.getValue();
 					}
 				}
 			}
@@ -70,7 +66,12 @@ public class FusionFurnaceRecipe
 		return ItemStack.EMPTY;
 	}
 	
-	private boolean compareItemStack(ItemStack input1, ItemStack key1)
+	public Table<ItemStack, ItemStack, ItemStack> getMaterialRecipe()
+	{
+		return this.recipesList;
+	}
+	
+	public boolean compareItemStack(ItemStack input1, ItemStack key1)
 	{
 		return key1.getItem() == input1.getItem() && (key1.getMetadata() == 32767 || key1.getMetadata() == input1.getMetadata());
 	}

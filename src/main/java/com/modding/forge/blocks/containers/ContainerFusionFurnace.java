@@ -1,10 +1,14 @@
 package com.modding.forge.blocks.containers;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.modding.forge.blocks.recipes.FusionFurnaceRecipe;
 import com.modding.forge.blocks.tilentities.TileEntityFusionFurnace;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
@@ -96,23 +100,31 @@ public class ContainerFusionFurnace extends Container
 			}
 			else if(index != 2 && index != 0 && index != 1)
 			{
-				Slot slot1 = (Slot)this.inventorySlots.get(index + 1);
-				
-				if(!FusionFurnaceRecipe.getInstance().getRecipesResult(stack1, slot1.getStack(), this.TILE_ENTITY.getField(4)).isEmpty())
+				for(Entry<ItemStack, Map<ItemStack, ItemStack>> entry : FusionFurnaceRecipe.getInstance().getMaterialRecipe().columnMap().entrySet())
 				{
-					if(!this.mergeItemStack(stack1, 0, 2, false))return ItemStack.EMPTY;
-				}
-				else if(TileEntityFusionFurnace.isItemFuel(stack1))
-				{
-					if(!this.mergeItemStack(stack1, 2, 3, false)) return ItemStack.EMPTY;
-				}
-				else if(index >= 4 && index < 31)
-				{
-					if(!this.mergeItemStack(stack1, 31, 40, false)) return ItemStack.EMPTY;
-				}
-				else if(index >= 31 && index < 40 && !this.mergeItemStack(stack1, 4, 31, false))
-				{
-					return ItemStack.EMPTY;
+					for(Entry<ItemStack, ItemStack> entry1 : entry.getValue().entrySet())
+					{
+						if(FusionFurnaceRecipe.getInstance().compareItemStack(stack1, entry.getKey()))
+						{
+							if(!this.mergeItemStack(stack1, 0, 2, false)) return ItemStack.EMPTY;
+						}
+						else if(FusionFurnaceRecipe.getInstance().compareItemStack(stack1, entry1.getKey()))
+						{
+							if(!this.mergeItemStack(stack1, 0, 2, false)) return ItemStack.EMPTY;
+						}
+						else if(TileEntityFusionFurnace.isItemFuel(stack1) && this.inventorySlots.get(2).getStack().getCount() < 64)
+						{
+							if(!this.mergeItemStack(stack1, 2, 3, false)) return ItemStack.EMPTY;
+						}
+						else if(index >= 4 && index < 31)
+						{
+							if(!this.mergeItemStack(stack1, 31, 40, false)) return ItemStack.EMPTY;
+						}
+						else if(index >= 31 && index < 40 && !this.mergeItemStack(stack1, 4, 31, false))
+						{
+							return ItemStack.EMPTY;
+						}
+					}
 				}
 			}
 			else if(!this.mergeItemStack(stack1, 4, 40, false)) 
