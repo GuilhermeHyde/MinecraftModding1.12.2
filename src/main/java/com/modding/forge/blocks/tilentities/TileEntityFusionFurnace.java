@@ -52,7 +52,7 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			}
 		}
 	};
-	private int heat, maxHeat = 2000, castingProcess, meltingProcess, maxCasting = 8, maxMelting = 200;
+	private int heat, maxHeat = 5000, castingProcess, meltingProcess, maxCasting, maxMelting;
 	private String tileEntityName;
 	private ItemStack smelting = ItemStack.EMPTY;
 	
@@ -161,17 +161,20 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		
 		if(this.isHeating() && this.canSmelt())
 		{
+			ItemStack output = FusionFurnaceRecipe.getInstance().getRecipesResult(input[0], input[1], this.getField(4));
+			this.maxMelting = FusionFurnaceRecipe.getInstance().getMeltingProcess(output);
+			this.maxCasting = FusionFurnaceRecipe.getInstance().getCastingProcess(output);
 			this.meltingProcess += 1;
 			
-			if(this.meltingProcess == this.maxMelting)
+			if(this.meltingProcess == maxMelting)
 			{
 				this.castingProcess += 1;
 				this.meltingProcess = 0;
+				this.heat -= 50;
 			}
 			
-			if(this.castingProcess == this.maxCasting)
+			if(this.castingProcess == maxCasting)
 			{
-				ItemStack output = FusionFurnaceRecipe.getInstance().getRecipesResult(input[0], input[1], this.getField(4));
 				if(!output.isEmpty())
 				{
 					this.smelting = output;
@@ -192,7 +195,6 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 				
 				this.smelting = ItemStack.EMPTY;
 				this.castingProcess = 0;
-				this.heat -= 100;
 				return;
 			}
 		}
@@ -288,22 +290,22 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		switch(id)
 		{
 		case 0:
-			this.castingProcess = value;
+			if(value >= 0) this.castingProcess = value;
 			break;
 		case 1:
-			this.meltingProcess = value;
+			if(value >= 0) this.meltingProcess = value;
 			break;
 		case 2:
-			this.maxCasting = value;
+			if(value >= 0) this.maxCasting = value;
 			break;
 		case 3:
-			this.maxMelting = value;
+			if(value >= 0) this.maxMelting = value;
 			break;
 		case 4:
-			this.heat = value;
+			if(value >= 0) this.heat = value;
 			break;
 		case 5:
-			this.maxHeat = value;
+			if(value >= 0) this.maxHeat = value;
 			break;
 		}
 	}

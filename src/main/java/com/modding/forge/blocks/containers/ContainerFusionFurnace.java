@@ -8,7 +8,6 @@ import com.modding.forge.blocks.tilentities.TileEntityFusionFurnace;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
@@ -114,9 +113,9 @@ public class ContainerFusionFurnace extends Container
 						}
 						else if(TileEntityFusionFurnace.isItemFuel(stack1))
 						{
-							boolean isEntry = FusionFurnaceRecipe.getInstance().compareItemStack(stack1, entry.getKey()) || FusionFurnaceRecipe.getInstance().compareItemStack(stack1, entry1.getKey());
+							boolean isEntry = FusionFurnaceRecipe.getInstance().compareItemStack(stack1, entry1.getKey());
 							
-							if(!isEntry && this.inventorySlots.get(2).getStack().getCount() >= 64)
+							if(isEntry && this.inventorySlots.get(2).getStack().getCount() >= 64)
 							{
 								if(!this.mergeItemStack(stack1, 0, 2, false)) return ItemStack.EMPTY;
 							}
