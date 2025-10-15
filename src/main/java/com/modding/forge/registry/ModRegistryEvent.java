@@ -21,7 +21,7 @@ public class ModRegistryEvent
 	public void onRegisterItemEvent(RegistryEvent.Register<Item> event)
 	{
 		InitBlocks.registerBlockItem(event.getRegistry());
-		InitItems.itemRegistry = event.getRegistry();
 		InitItems.initlaization();
+		event.getRegistry().registerAll(InitItems.REGISTER_ITEMS.toArray(new Item[0]));
 	}
 }

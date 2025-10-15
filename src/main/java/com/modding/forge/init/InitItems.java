@@ -1,31 +1,33 @@
 package com.modding.forge.init;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.modding.forge.Reference;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class InitItems
 {
+	public static final List<Item> REGISTER_ITEMS = new ArrayList<Item>();
 	public static Item bronze_ingot, steel_ingot, titanium_ingot, adamantium_ingot, tungsten_ingot, mithril_ingot, orichalcum_ingot;
-	public static IForgeRegistry<Item> itemRegistry;
-	
+
 	public static void initlaization()
 	{
-		bronze_ingot = register("bronze_ingot", new Item()).setCreativeTab(CreativeTabs.MATERIALS);
-		steel_ingot = register("steel_ingot", new Item()).setCreativeTab(CreativeTabs.MATERIALS);
-		titanium_ingot = register("titanium_ingot", new Item()).setCreativeTab(CreativeTabs.MATERIALS);
-		tungsten_ingot = register("tungsten_ingot", new Item()).setCreativeTab(CreativeTabs.MATERIALS);
-		orichalcum_ingot = register("orichalcum_ingot", new Item()).setCreativeTab(CreativeTabs.MATERIALS);
-		mithril_ingot = register("mithril_ingot", new Item()).setCreativeTab(CreativeTabs.MATERIALS);
-		adamantium_ingot = register("adamantium_ingot", new Item()).setCreativeTab(CreativeTabs.MATERIALS);
+		bronze_ingot = register("bronze_ingot");
+		steel_ingot = register("steel_ingot");
+		titanium_ingot = register("titanium_ingot");
+		tungsten_ingot = register("tungsten_ingot");
+		orichalcum_ingot = register("orichalcum_ingot");
+		mithril_ingot = register("mithril_ingot");
+		adamantium_ingot = register("adamantium_ingot");
 	}
 	
-	public static Item register(String name, Item item)
+	public static Item register(String name)
 	{
-		item.setUnlocalizedName(name);
-		itemRegistry.register(item.setRegistryName(Reference.location(name)));
+		Item item = new Item().setUnlocalizedName(name).setRegistryName(Reference.location(name)).setCreativeTab(CreativeTabs.MATERIALS).setMaxStackSize(64);
+		REGISTER_ITEMS.add(item);
 		return item;
 	}
 }

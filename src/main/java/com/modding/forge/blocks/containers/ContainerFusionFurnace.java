@@ -1,8 +1,5 @@
 package com.modding.forge.blocks.containers;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.modding.forge.blocks.recipes.FusionFurnaceRecipe;
 import com.modding.forge.blocks.tilentities.TileEntityFusionFurnace;
 
@@ -99,37 +96,35 @@ public class ContainerFusionFurnace extends Container
 			}
 			else if(index != 2 && index != 0 && index != 1)
 			{
-				for(Entry<ItemStack, Map<ItemStack, ItemStack>> entry : FusionFurnaceRecipe.getInstance().getMaterialRecipe().columnMap().entrySet())
+				boolean isFuelRecipe = !FusionFurnaceRecipe.getInstance().isResult(stack1).isEmpty() && TileEntityFusionFurnace.isItemFuel(stack1);
+				Slot slotFuel = this.inventorySlots.get(2);
+				
+				if(isFuelRecipe)
 				{
-					for(Entry<ItemStack, ItemStack> entry1 : entry.getValue().entrySet())
+					if(!slotFuel.getStack().isEmpty() && slotFuel.getStack().getCount() >= stack1.getMaxStackSize())
 					{
-						if(FusionFurnaceRecipe.getInstance().compareItemStack(stack1, entry.getKey()))
-						{
-							if(!this.mergeItemStack(stack1, 0, 2, false)) return ItemStack.EMPTY;
-						}
-						else if(FusionFurnaceRecipe.getInstance().compareItemStack(stack1, entry1.getKey()))
-						{
-							if(!this.mergeItemStack(stack1, 0, 2, false)) return ItemStack.EMPTY;
-						}
-						else if(TileEntityFusionFurnace.isItemFuel(stack1))
-						{
-							boolean isEntry = FusionFurnaceRecipe.getInstance().compareItemStack(stack1, entry1.getKey());
-							
-							if(isEntry && this.inventorySlots.get(2).getStack().getCount() >= 64)
-							{
-								if(!this.mergeItemStack(stack1, 0, 2, false)) return ItemStack.EMPTY;
-							}
-							else if(!this.mergeItemStack(stack1, 2, 3, false)) return ItemStack.EMPTY;
-						}
-						else if(index >= 4 && index < 31)
-						{
-							if(!this.mergeItemStack(stack1, 31, 40, false)) return ItemStack.EMPTY;
-						}
-						else if(index >= 31 && index < 40 && !this.mergeItemStack(stack1, 4, 31, false))
-						{
-							return ItemStack.EMPTY;
-						}
+						if(!this.mergeItemStack(stack1, 0, 2, false)) return ItemStack.EMPTY;
 					}
+					else
+					{
+						if(!this.mergeItemStack(stack1, 2, 3, false)) return ItemStack.EMPTY;
+					}
+				}
+				if(!FusionFurnaceRecipe.getInstance().isResult(stack1).isEmpty())
+				{
+					if(!this.mergeItemStack(stack1, 0, 2, false)) return ItemStack.EMPTY;
+				}
+				else if(TileEntityFusionFurnace.isItemFuel(stack1))
+				{
+					if(!this.mergeItemStack(stack1, 2, 3, false)) return ItemStack.EMPTY;
+				}
+				else if(index >= 4 && index < 31)
+				{
+					if(!this.mergeItemStack(stack1, 31, 40, false)) return ItemStack.EMPTY;
+				}
+				else if(index >= 31 && index < 40 && !this.mergeItemStack(stack1, 4, 31, false))
+				{
+					return ItemStack.EMPTY;
 				}
 			}
 			else if(!this.mergeItemStack(stack1, 4, 40, false)) return ItemStack.EMPTY;

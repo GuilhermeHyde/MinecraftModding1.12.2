@@ -67,14 +67,28 @@ public class FusionFurnaceRecipe
 		return ItemStack.EMPTY;
 	}
 	
-	public Table<ItemStack, ItemStack, ItemStack> getMaterialRecipe()
+	public ItemStack isResult(ItemStack input)
 	{
-		return this.recipesList;
+		for(Entry<ItemStack, Map<ItemStack, ItemStack>> recipe : recipesList.rowMap().entrySet())
+		{
+			for(Entry<ItemStack, ItemStack> entry : recipe.getValue().entrySet())
+			{
+				if(this.compareItemStack(input, (ItemStack)recipe.getKey()))
+				{
+					return entry.getKey();
+				}
+				else if(this.compareItemStack(input, (ItemStack)entry.getKey()))
+				{
+					return recipe.getKey();
+				}
+			}
+		}
+		return ItemStack.EMPTY;
 	}
 	
-	public boolean compareItemStack(ItemStack input1, ItemStack key1)
+	public boolean compareItemStack(ItemStack input, ItemStack key)
 	{
-		return key1.getItem() == input1.getItem() && (key1.getMetadata() == 32767 || key1.getMetadata() == input1.getMetadata());
+		return key.getItem() == input.getItem() && (key.getMetadata() == 32767 || key.getMetadata() == input.getMetadata());
 	}
 	
 	public int getMeltingPoint(ItemStack input1)
