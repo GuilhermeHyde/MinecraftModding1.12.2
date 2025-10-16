@@ -13,15 +13,14 @@ public class ModRegistryEvent
 	@SubscribeEvent
 	public void onRegisterBlockEvent(RegistryEvent.Register<Block> event)
 	{
-		InitBlocks.registerBlock(event.getRegistry());
+		event.getRegistry().registerAll(InitBlocks.REGISTER_BLOCK.toArray(new Block[0]));
 		TileEntityRegistry.register();
 	}
 	
 	@SubscribeEvent
 	public void onRegisterItemEvent(RegistryEvent.Register<Item> event)
 	{
-		InitBlocks.registerBlockItem(event.getRegistry());
-		InitItems.initlaization();
 		event.getRegistry().registerAll(InitItems.REGISTER_ITEMS.toArray(new Item[0]));
+		event.getRegistry().registerAll(InitBlocks.REGISTER_ITEMBLOCK.toArray(new Item[0]));
 	}
 }

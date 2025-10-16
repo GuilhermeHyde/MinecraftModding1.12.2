@@ -46,13 +46,13 @@ public class FusionFurnaceBlock extends BlockContainer
 	@Override
 	public Item getItemDropped(IBlockState state, Random rand, int fortune)
 	{
-		return Item.getItemFromBlock(InitBlocks.fusion_furnace);
+		return Item.getItemFromBlock(InitBlocks.FUSION_FURNACE);
 	}
 	
 	@Override
 	public ItemStack getItem(World world, BlockPos pos, IBlockState state)
 	{
-		return new ItemStack(InitBlocks.fusion_furnace);
+		return new ItemStack(InitBlocks.FUSION_FURNACE);
 	}
 	
 	@Override
@@ -90,8 +90,8 @@ public class FusionFurnaceBlock extends BlockContainer
 		IBlockState state = world.getBlockState(pos);
 		TileEntity tileEntity = world.getTileEntity(pos);
 		
-		if(active) world.setBlockState(pos, InitBlocks.fusion_furnace.getDefaultState().withProperty(FACING, state.getValue(FACING)).withProperty(BURNING, true), 3);
-		else world.setBlockState(pos, InitBlocks.fusion_furnace.getDefaultState().withProperty(FACING, state.getValue(FACING)).withProperty(BURNING, false), 3);
+		if(active) world.setBlockState(pos, InitBlocks.FUSION_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)).withProperty(BURNING, true), 3);
+		else world.setBlockState(pos, InitBlocks.FUSION_FURNACE.getDefaultState().withProperty(FACING, state.getValue(FACING)).withProperty(BURNING, false), 3);
 		
 		if(tileEntity != null)
 		{

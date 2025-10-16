@@ -10,6 +10,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemHoe;
@@ -135,9 +136,8 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		if(this.isHeating())
 		{
 			FusionFurnaceBlock.setState(true, world, pos);
+			if(this.heat >= this.maxHeat)this.heat = this.maxHeat;
 		}
-		
-		if(this.heat >= this.maxHeat) this.heat = this.maxHeat;
 		else if (this.heat < 0) this.heat = 0;
 		
 		if(this.heat < this.maxHeat)
@@ -203,8 +203,6 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			this.meltingProcess = 0;
 			this.castingProcess = 0;
 		}
-		
-		this.markDirty();
 	}
 	
 	private boolean canSmelt()

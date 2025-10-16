@@ -13,13 +13,13 @@ public class ItemRendering
 	@SubscribeEvent
 	public void onModelRegisterEvent(ModelRegistryEvent event)
 	{
-		register(InitItems.bronze_ingot, 0, "bronze_ingot");
-		register(InitItems.steel_ingot, 0, "steel_ingot");
-		register(InitItems.titanium_ingot, 0, "titanium_ingot");
-		register(InitItems.adamantium_ingot, 0, "adamantium_ingot");
-		register(InitItems.tungsten_ingot, 0, "tungsten_ingot");
-		register(InitItems.mithril_ingot, 0, "mithril_ingot");
-		register(InitItems.orichalcum_ingot, 0, "orichalcum_ingot");
+		register(InitItems.BRONZE_INGOT, 0, "bronze_ingot");
+		register(InitItems.STEEL_INGOT, 0, "steel_ingot");
+		register(InitItems.TITANIUM_INGOT, 0, "titanium_ingot");
+		register(InitItems.ADAMANTIUM_INGOT, 0, "adamantium_ingot");
+		register(InitItems.TUNGSTEN_INGOT, 0, "tungsten_ingot");
+		register(InitItems.MITHRIL_INGOT, 0, "mithril_ingot");
+		register(InitItems.ORICHALCUM_INGOT, 0, "orichalcum_ingot");
 	}
 	
 	public static void register(Item item, int meta, String model)

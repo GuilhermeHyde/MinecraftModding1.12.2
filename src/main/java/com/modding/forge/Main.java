@@ -1,6 +1,5 @@
 package com.modding.forge;
 
-import com.modding.forge.init.InitBlocks;
 import com.modding.forge.proxy.CommonProxy;
 import com.modding.forge.proxy.IProxy;
 import com.modding.forge.registry.GuiHandler;
@@ -27,7 +26,6 @@ public class Main
 	@EventHandler
 	public static void preInit(FMLPreInitializationEvent event)
 	{
-		InitBlocks.initlaization();
 		CommonProxy.register(new ModRegistryEvent());
 		proxy.preInit(event);
 	}

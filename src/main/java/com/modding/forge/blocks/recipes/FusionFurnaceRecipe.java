@@ -27,13 +27,13 @@ public class FusionFurnaceRecipe
 	
 	private FusionFurnaceRecipe()
 	{
-		addFusionRecipes(new ItemStack(Items.IRON_INGOT), new ItemStack(Items.GOLD_INGOT), 1000, 200, 8, new ItemStack(InitItems.bronze_ingot), 1.0F);
-		addFusionRecipes(new ItemStack(Items.IRON_INGOT), new ItemStack(Items.COAL), 1530, 200, 8, new ItemStack(InitItems.steel_ingot), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.steel_ingot), new ItemStack(InitItems.bronze_ingot), 1725, 300, 10, new ItemStack(InitItems.titanium_ingot), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.titanium_ingot), new ItemStack(Items.BLAZE_POWDER), 3422, 400, 18, new ItemStack(InitItems.tungsten_ingot), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.titanium_ingot), new ItemStack(Items.MAGMA_CREAM), 3880, 360, 14, new ItemStack(InitItems.orichalcum_ingot), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.tungsten_ingot), new ItemStack(Items.DRAGON_BREATH), 5000, 480, 26, new ItemStack(InitItems.adamantium_ingot), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.orichalcum_ingot), new ItemStack(Items.DRAGON_BREATH), 4875, 460, 22, new ItemStack(InitItems.mithril_ingot), 1.0F);
+		addFusionRecipes(new ItemStack(Items.IRON_INGOT), new ItemStack(Items.GOLD_INGOT), 1000, 200, 8, new ItemStack(InitItems.BRONZE_INGOT), 1.0F);
+		addFusionRecipes(new ItemStack(Items.IRON_INGOT), new ItemStack(Items.COAL), 1530, 200, 8, new ItemStack(InitItems.STEEL_INGOT), 1.0F);
+		addFusionRecipes(new ItemStack(InitItems.STEEL_INGOT), new ItemStack(InitItems.BRONZE_INGOT), 1725, 300, 10, new ItemStack(InitItems.TITANIUM_INGOT), 1.0F);
+		addFusionRecipes(new ItemStack(InitItems.TITANIUM_INGOT), new ItemStack(Items.BLAZE_POWDER), 3422, 400, 18, new ItemStack(InitItems.TUNGSTEN_INGOT), 1.0F);
+		addFusionRecipes(new ItemStack(InitItems.TITANIUM_INGOT), new ItemStack(Items.MAGMA_CREAM), 3880, 360, 14, new ItemStack(InitItems.ORICHALCUM_INGOT), 1.0F);
+		addFusionRecipes(new ItemStack(InitItems.TUNGSTEN_INGOT), new ItemStack(Items.DRAGON_BREATH), 5000, 480, 26, new ItemStack(InitItems.ADAMANTIUM_INGOT), 1.0F);
+		addFusionRecipes(new ItemStack(InitItems.ORICHALCUM_INGOT), new ItemStack(Items.DRAGON_BREATH), 4875, 460, 22, new ItemStack(InitItems.MITHRIL_INGOT), 1.0F);
 	}
 	
 	private void addFusionRecipes(ItemStack input1, ItemStack input2, int heat, int melting, int casting, ItemStack result, float exp)
