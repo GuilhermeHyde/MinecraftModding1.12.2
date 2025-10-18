@@ -57,7 +57,6 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 	    {
 	    	TileEntityFusionFurnace.this.markDirty();
 	    }
-
 	};
 	private int heat, maxHeat = 5000, castingProcess, meltingProcess, maxCasting, maxMelting;
 	private String tileEntityName;
@@ -112,12 +111,12 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 	{
 		super.writeToNBT(compound);
 		compound.setTag("Inventory", this.handler.serializeNBT());
-		compound.setInteger("Heat", this.heat);
-		compound.setInteger("MeltingProcess", this.meltingProcess);
-		compound.setInteger("CastingProcess", this.castingProcess);
-		compound.setInteger("MaxMelting", this.maxMelting);
-		compound.setInteger("MaxCasting", this.maxCasting);
-		compound.setInteger("MaxHeat", this.maxHeat);
+		compound.setInteger("Heat", (short)this.heat);
+		compound.setInteger("MeltingProcess", (short)this.meltingProcess);
+		compound.setInteger("CastingProcess", (short)this.castingProcess);
+		compound.setInteger("MaxMelting", (short)this.maxMelting);
+		compound.setInteger("MaxCasting", (short)this.maxCasting);
+		compound.setInteger("MaxHeat", (short)this.maxHeat);
 		if(this.hasCustomName()) compound.setString("CustomName", this.tileEntityName);
 		return compound;
 	}
@@ -165,8 +164,7 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 					this.handler.setStackInSlot(2, item1);
 					flag = true;
 				}
-				
-				if(item == Items.LAVA_BUCKET)
+				else if(item == Items.LAVA_BUCKET)
 				{
 					this.handler.setStackInSlot(2, new ItemStack(Items.BUCKET));
 					flag = true;
@@ -199,15 +197,12 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 					this.handler.setStackInSlot(0, input[0]);
 					this.handler.setStackInSlot(1, input[1]);
 					flag = true;
-				}
-				
-				if(this.handler.getStackInSlot(3).getCount() > 0)
-				{
-					this.handler.getStackInSlot(3).grow(1);
-				}
-				else
-				{
-					this.handler.insertItem(3, this.smelting, false);
+					
+					if(this.handler.getStackInSlot(3).getCount() > 0)
+					{
+						this.handler.getStackInSlot(3).grow(1);
+					}
+					else this.handler.insertItem(3, this.smelting, false);
 				}
 				
 				this.smelting = ItemStack.EMPTY;
@@ -219,7 +214,6 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		{
 			this.meltingProcess = 0;
 			this.castingProcess = 0;
-			flag = true;
 		}
 		
 		if(flag) this.markDirty();

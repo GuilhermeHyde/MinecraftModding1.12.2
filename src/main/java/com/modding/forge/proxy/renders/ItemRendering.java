@@ -1,5 +1,7 @@
 package com.modding.forge.proxy.renders;
 
+import java.util.List;
+
 import com.modding.forge.init.InitItems;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -13,17 +15,15 @@ public class ItemRendering
 	@SubscribeEvent
 	public void onModelRegisterEvent(ModelRegistryEvent event)
 	{
-		register(InitItems.BRONZE_INGOT, 0, "bronze_ingot");
-		register(InitItems.STEEL_INGOT, 0, "steel_ingot");
-		register(InitItems.TITANIUM_INGOT, 0, "titanium_ingot");
-		register(InitItems.ADAMANTIUM_INGOT, 0, "adamantium_ingot");
-		register(InitItems.TUNGSTEN_INGOT, 0, "tungsten_ingot");
-		register(InitItems.MITHRIL_INGOT, 0, "mithril_ingot");
-		register(InitItems.ORICHALCUM_INGOT, 0, "orichalcum_ingot");
+		List<Item> itemList = InitItems.REGISTER_ITEMS;
+		for(int i = 0; i < itemList.size(); i++)
+		{
+			if(!itemList.isEmpty()) register(itemList.get(i));
+		}
 	}
 	
-	public static void register(Item item, int meta, String model)
+	private static void register(Item item)
 	{
-		ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(item.getRegistryName(), "inventory"));
+		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
 	}
 }

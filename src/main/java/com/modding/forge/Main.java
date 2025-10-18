@@ -1,8 +1,6 @@
 package com.modding.forge;
 
-import com.modding.forge.proxy.CommonProxy;
 import com.modding.forge.proxy.IProxy;
-import com.modding.forge.registry.GuiHandler;
 import com.modding.forge.registry.ModRegistryEvent;
 
 import net.minecraftforge.fml.common.Mod;
@@ -12,7 +10,6 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 @Mod(modid = Reference.MOD_ID, version = Reference.VERSION, name = Reference.NAME)
 public class Main
@@ -26,20 +23,21 @@ public class Main
 	@EventHandler
 	public static void preInit(FMLPreInitializationEvent event)
 	{
-		CommonProxy.register(new ModRegistryEvent());
+		ModRegistryEvent.preInit(event);
 		proxy.preInit(event);
 	}
 	
 	@EventHandler
 	public static void init(FMLInitializationEvent event)
 	{
-		NetworkRegistry.INSTANCE.registerGuiHandler(Main.instance, new GuiHandler());
+		ModRegistryEvent.init(event);
 		proxy.init(event);
 	}
 	
 	@EventHandler
 	public static void postInit(FMLPostInitializationEvent event)
 	{
+		ModRegistryEvent.postInit(event);
 		proxy.postInit(event);
 	}
 }

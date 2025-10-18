@@ -1,6 +1,7 @@
 package com.modding.forge.proxy.renders;
 
-import com.modding.forge.Reference;
+import java.util.List;
+
 import com.modding.forge.init.InitBlocks;
 
 import net.minecraft.block.Block;
@@ -15,18 +16,15 @@ public class BlockRendering
 	@SubscribeEvent
 	public void onModelRegisterEvent(ModelRegistryEvent event)
 	{
-		register(InitBlocks.BRONZE_BLOCK, 0, "bronze_block");
-		register(InitBlocks.STEEL_BLOCK, 0, "steel_block");
-		register(InitBlocks.TITANIUM_BLOCK, 0, "titanium_block");
-		register(InitBlocks.ADAMANTIUM_BLOCK, 0, "adamantium_block");
-		register(InitBlocks.TUNGSTEN_BLOCK, 0, "tungsten_block");
-		register(InitBlocks.MITHRIL_BLOCK, 0, "mithril_block");
-		register(InitBlocks.ORICHALCUM_BLOCK, 0, "orichalcum_block");
-		register(InitBlocks.FUSION_FURNACE, 0, "fusion_furnace");
+		List<Block> blockList = InitBlocks.REGISTER_BLOCK;
+		for(int i = 0; i < blockList.size(); i++)
+		{
+			if(!blockList.isEmpty()) register(blockList.get(i));
+		}
 	}
 	
-	public static void register(Block block, int meta, String model)
+	private static void register(Block block)
 	{
-		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), meta, new ModelResourceLocation(Reference.modID() + model, "inventory"));
+		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
 	}
 }
