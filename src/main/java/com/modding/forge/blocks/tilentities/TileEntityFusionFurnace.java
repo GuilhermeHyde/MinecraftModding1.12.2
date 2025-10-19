@@ -7,6 +7,7 @@ import com.modding.forge.blocks.recipes.FusionFurnaceRecipe;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -20,6 +21,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -34,33 +36,26 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 {
 	public final ItemStackHandler handler = new ItemStackHandler(4)
 	{
-		@Override
-		public boolean isItemValid(int slot, @Nonnull ItemStack stack)
-		{
-			switch(slot)
-			{
-			case 0:
-				return true;
-			case 1:
-				return true;
-			case 2:
-				return isItemFuel(stack);
-			case 3:
-				return false;
-				default:
-					return false;
-			}
-		}
-		
 	    @Override
-	    protected void onContentsChanged(int slot)
+	    public boolean isItemValid(int slot, @Nonnull ItemStack stack)
 	    {
-	    	TileEntityFusionFurnace.this.markDirty();
+	    	switch(slot)
+	    	{
+	    	case 0:
+	    		return true;
+	    	case 1:
+	    		return true;
+	    	case 2:
+	    		return isItemFuel(stack);
+	    	case 3:
+	    		return false;
+	    		default:
+	    			return true;
+	    	}
 	    }
 	};
-	private int heat, maxHeat = 5000, castingProcess, meltingProcess, maxCasting, maxMelting;
+	private int heat, maxHeat = 5000, castingProcess, meltingProcess, maxCasting, maxMelting, removeCount;
 	private String tileEntityName;
-	private ItemStack smelting = ItemStack.EMPTY;
 	
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
@@ -103,6 +98,7 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		this.maxMelting = compound.getInteger("MaxMelting");
 		this.maxCasting = compound.getInteger("MaxCasting");
 		this.maxHeat = compound.getInteger("MaxHeat");
+		this.removeCount = compound.getInteger("RemoveCount");
 		if(compound.hasKey("CustomName", 8)) setName(compound.getString("CustomName"));
 	}
 
@@ -117,6 +113,7 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		compound.setInteger("MaxMelting", (short)this.maxMelting);
 		compound.setInteger("MaxCasting", (short)this.maxCasting);
 		compound.setInteger("MaxHeat", (short)this.maxHeat);
+		compound.setInteger("RemoveCount", (short)this.removeCount);
 		if(this.hasCustomName()) compound.setString("CustomName", this.tileEntityName);
 		return compound;
 	}
@@ -136,6 +133,7 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 	public void update()
 	{
 		ItemStack[] input = new ItemStack[] {this.handler.getStackInSlot(0), this.handler.getStackInSlot(1)};
+		ItemStack output = FusionFurnaceRecipe.getInstance().getRecipesResult(input[0], input[1], 5000);
 		ItemStack slotFuel = this.handler.getStackInSlot(2);
 		boolean flag = false;
 		
@@ -174,49 +172,93 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		
 		if(this.isHeating() && this.canSmelt())
 		{
-			ItemStack output = FusionFurnaceRecipe.getInstance().getRecipesResult(input[0], input[1], this.getField(4));
-			this.maxMelting = FusionFurnaceRecipe.getInstance().getMeltingProcess(output);
 			this.maxCasting = FusionFurnaceRecipe.getInstance().getCastingProcess(output);
-			this.meltingProcess++;
+			this.maxMelting = FusionFurnaceRecipe.getInstance().getCastingProcess(output) * 4;
 			
-			if(this.meltingProcess >= maxMelting)
+			this.meltingProcess++;
+			if(this.meltingProcess >= this.maxMelting)
 			{
+				this.heat -= 50;
 				this.castingProcess++;
 				this.meltingProcess = 0;
-				this.heat -= 50;
-				flag = true;
 			}
 			
-			if(this.castingProcess >= maxCasting)
-			{
-				if(!output.isEmpty())
-				{
-					this.smelting = output;
-					input[0].shrink(1);
-					input[1].shrink(1);
-					this.handler.setStackInSlot(0, input[0]);
-					this.handler.setStackInSlot(1, input[1]);
-					flag = true;
-					
-					if(this.handler.getStackInSlot(3).getCount() > 0)
-					{
-						this.handler.getStackInSlot(3).grow(1);
-					}
-					else this.handler.insertItem(3, this.smelting, false);
-				}
+			if(this.castingProcess >= this.maxCasting)
+			{	
+				if(this.handler.getStackInSlot(3).getCount() > 0) this.handler.getStackInSlot(3).grow(1);
+				else if(!output.isEmpty()) this.handler.insertItem(3, output.copy(), false);
 				
-				this.smelting = ItemStack.EMPTY;
+				input[0].shrink(1);
+				input[1].shrink(1);
+				this.handler.setStackInSlot(0, input[0]);
+				this.handler.setStackInSlot(1, input[1]);
+				
+				this.removeCount++;
 				this.castingProcess = 0;
-				flag = true;
 			}
 		}
 		else
 		{
-			this.meltingProcess = 0;
 			this.castingProcess = 0;
+			this.meltingProcess = 0;
+		}
+		
+		if(this.removeCount > 0)
+		{
+			int i = this.removeCount;
+			float f = FusionFurnaceRecipe.getInstance().getCraftingExp(output);
+			
+			if(f == 0.0F) i = 0;
+			else if(f < 1.0F)
+			{
+				int j = MathHelper.floor((float)i * f);
+				if(j < MathHelper.ceil((float)i * f) && Math.random() < (double)((float)i * f - (float)j)) j++;
+				i = j;
+			}
+			
+			if(this.handler.getStackInSlot(3).isEmpty())
+			{
+				if(!world.isRemote)
+				{
+					int k;
+					while(i > 0)
+					{
+						k = EntityXPOrb.getXPSplit(i);
+						i -= k;
+						world.spawnEntity(new EntityXPOrb(world, pos.getX(), pos.getY() + 0.5D, pos.getZ() + 0.5D, k));
+					}
+				}
+				this.removeCount = 0;
+			}
 		}
 		
 		if(flag) this.markDirty();
+	}
+	
+	public void onCrafting(ItemStack stack)
+	{
+		if(!world.isRemote)
+		{
+			int i = this.removeCount;
+			float f = FusionFurnaceRecipe.getInstance().getCraftingExp(stack);
+			
+			if(f == 0.0F) i = 0;
+			else if(f < 1.0F)
+			{
+				int j = MathHelper.floor((float)i * f);
+				if(j < MathHelper.ceil((float)i * f) && Math.random() < (double)((float)i * f - (float)j)) j++;
+				i = j;
+			}
+			
+			int k = 0;
+			while(i > 0)
+			{
+				k = EntityXPOrb.getXPSplit(i);
+				i -= k;
+				world.spawnEntity(new EntityXPOrb(world, pos.getX(), pos.getY(), pos.getZ(), k));
+			}
+		}
+		this.removeCount = 0;
 	}
 	
 	private boolean canSmelt()
@@ -230,7 +272,7 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			{
 				ItemStack output = (ItemStack)this.handler.getStackInSlot(3);
 				if(output.isEmpty()) return true;
-				if(!output.isItemEqual(result)) return false;
+				if(!ItemStack.areItemsEqual(output, result)) return false;
 				int res = output.getCount() + result.getCount();
 				return res <= 64 && res <= output.getMaxStackSize();
 			}
@@ -292,6 +334,8 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			return this.heat;
 		case 5:
 			return this.maxHeat;
+		case 6:
+			return this.removeCount;
 		default:
 			return 0;
 		}
@@ -318,6 +362,8 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			break;
 		case 5:
 			if(value >= 0) this.maxHeat = value;
+		case 6:
+			if(value >= 0) this.removeCount = value;
 			break;
 		}
 	}

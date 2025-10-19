@@ -16,7 +16,7 @@ import net.minecraftforge.items.SlotItemHandler;
 public class ContainerFusionFurnace extends Container
 {
 	private final TileEntityFusionFurnace TILE_ENTITY;
-	private int heat, maxHeat, castingProcess, meltingProcess, maxCasting, maxMelting;
+	private int heat, maxHeat, castingProcess, meltingProcess, maxCasting, maxMelting, removeCount;
 	
 	public ContainerFusionFurnace(InventoryPlayer inventory, TileEntityFusionFurnace tileEntity)
 	{
@@ -68,6 +68,7 @@ public class ContainerFusionFurnace extends Container
 			if(this.maxMelting != this.TILE_ENTITY.getField(3)) listener.sendWindowProperty(this, 3, this.TILE_ENTITY.getField(3));
 			if(this.heat != this.TILE_ENTITY.getField(4)) listener.sendWindowProperty(this, 4, this.TILE_ENTITY.getField(4));
 			if(this.maxHeat != this.TILE_ENTITY.getField(5)) listener.sendWindowProperty(this, 5, this.TILE_ENTITY.getField(5));
+			if(this.removeCount != this.TILE_ENTITY.getField(6)) listener.sendWindowProperty(this, 6, this.TILE_ENTITY.getField(6));
 		}
 		
 		this.castingProcess = this.TILE_ENTITY.getField(0);
@@ -76,6 +77,7 @@ public class ContainerFusionFurnace extends Container
 		this.maxMelting = this.TILE_ENTITY.getField(3);
 		this.heat = this.TILE_ENTITY.getField(4);
 		this.maxHeat = this.TILE_ENTITY.getField(5);
+		this.removeCount = this.TILE_ENTITY.getField(6);
 	}
 	
 	@Override

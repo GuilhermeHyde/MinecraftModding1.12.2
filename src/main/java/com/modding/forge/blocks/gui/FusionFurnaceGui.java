@@ -54,7 +54,7 @@ public class FusionFurnaceGui extends GuiContainer
 		}
 		
 		int k = this.getBurnLeftScaled(13);
-		this.drawTexturedModalRect(this.guiLeft + 51, this.guiTop + 26 + 13 - k, 176, 13 - k, 14, k + 1);
+		this.drawTexturedModalRect(this.guiLeft + 51, this.guiTop + 25 + 13 - k, 176, 13 - k, 14, k + 1);
 		
 		int l = this.getCookProgressScaled(24);
 		this.drawTexturedModalRect(this.guiLeft + 93, this.guiTop + 24, 176, 14, l + 1, 16);

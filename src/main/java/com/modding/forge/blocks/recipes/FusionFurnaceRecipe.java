@@ -27,13 +27,13 @@ public class FusionFurnaceRecipe
 	
 	private FusionFurnaceRecipe()
 	{
-		addFusionRecipes(new ItemStack(Items.IRON_INGOT), new ItemStack(Items.GOLD_INGOT), 1000, 200, 8, new ItemStack(InitItems.BRONZE_INGOT), 1.0F);
-		addFusionRecipes(new ItemStack(Items.IRON_INGOT), new ItemStack(Items.COAL), 1530, 200, 8, new ItemStack(InitItems.STEEL_INGOT), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.STEEL_INGOT), new ItemStack(InitItems.BRONZE_INGOT), 1725, 300, 10, new ItemStack(InitItems.TITANIUM_INGOT), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.TITANIUM_INGOT), new ItemStack(Items.BLAZE_POWDER), 3422, 400, 18, new ItemStack(InitItems.TUNGSTEN_INGOT), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.TITANIUM_INGOT), new ItemStack(Items.MAGMA_CREAM), 3880, 360, 14, new ItemStack(InitItems.ORICHALCUM_INGOT), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.TUNGSTEN_INGOT), new ItemStack(Items.DRAGON_BREATH), 5000, 480, 26, new ItemStack(InitItems.ADAMANTIUM_INGOT), 1.0F);
-		addFusionRecipes(new ItemStack(InitItems.ORICHALCUM_INGOT), new ItemStack(Items.DRAGON_BREATH), 4875, 460, 22, new ItemStack(InitItems.MITHRIL_INGOT), 1.0F);
+		addFusionRecipes(new ItemStack(Items.IRON_INGOT), new ItemStack(Items.GOLD_INGOT), 1000, 300, 8, new ItemStack(InitItems.BRONZE_INGOT), 1.5F);
+		addFusionRecipes(new ItemStack(Items.IRON_INGOT), new ItemStack(Items.COAL), 1530, 300, 8, new ItemStack(InitItems.STEEL_INGOT), 1.5F);
+		addFusionRecipes(new ItemStack(InitItems.STEEL_INGOT), new ItemStack(InitItems.BRONZE_INGOT), 1725, 360, 10, new ItemStack(InitItems.TITANIUM_INGOT), 2.5F);
+		addFusionRecipes(new ItemStack(InitItems.TITANIUM_INGOT), new ItemStack(Items.BLAZE_POWDER), 3422, 400, 16, new ItemStack(InitItems.TUNGSTEN_INGOT), 4.0F);
+		addFusionRecipes(new ItemStack(InitItems.TITANIUM_INGOT), new ItemStack(Items.MAGMA_CREAM), 3422, 400, 16, new ItemStack(InitItems.ORICHALCUM_INGOT), 4.0F);
+		addFusionRecipes(new ItemStack(InitItems.TUNGSTEN_INGOT), new ItemStack(Items.DRAGON_BREATH), 5000, 480, 22, new ItemStack(InitItems.ADAMANTIUM_INGOT), 5.5F);
+		addFusionRecipes(new ItemStack(InitItems.ORICHALCUM_INGOT), new ItemStack(Items.DRAGON_BREATH), 5000, 480, 22, new ItemStack(InitItems.MITHRIL_INGOT), 5.5F);
 	}
 	
 	private void addFusionRecipes(ItemStack input1, ItemStack input2, int heat, int melting, int casting, ItemStack result, float exp)
@@ -54,13 +54,9 @@ public class FusionFurnaceRecipe
 			{
 				boolean flag = heat >= this.getMeltingPoint(entry.getValue());
 				
-				if(this.compareItemStack(input1, (ItemStack)recipe.getKey()))
+				if(this.compareItemStack(input1, (ItemStack)recipe.getKey()) || this.compareItemStack(input2, (ItemStack)recipe.getKey()))
 				{
-					if(this.compareItemStack(input2, entry.getKey()) && flag) return entry.getValue();
-				}
-				else if(this.compareItemStack(input2, (ItemStack)recipe.getKey()))
-				{
-					if(this.compareItemStack(input1, entry.getKey()) && flag) return entry.getValue();
+					if(flag && this.compareItemStack(input2, entry.getKey()) || this.compareItemStack(input1, (ItemStack)entry.getKey())) return entry.getValue();
 				}
 			}
 		}
@@ -88,7 +84,7 @@ public class FusionFurnaceRecipe
 	
 	public boolean compareItemStack(ItemStack input, ItemStack key)
 	{
-		return key.getItem() == input.getItem() && (key.getMetadata() == 32767 || key.getMetadata() == input.getMetadata());
+		return ItemStack.areItemsEqual(key, input) && (key.getMetadata() == 32767 || key.getMetadata() == input.getMetadata());
 	}
 	
 	public int getMeltingPoint(ItemStack input1)
