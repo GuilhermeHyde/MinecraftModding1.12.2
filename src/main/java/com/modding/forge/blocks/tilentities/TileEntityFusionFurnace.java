@@ -189,6 +189,7 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			{
 				bufferHeat -= 5;
 				this.setField(4, bufferHeat);
+				flag = true;
 			}
 			
 			bufferMelting++;
@@ -250,6 +251,7 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 					}
 				}
 				this.setField(6, 0);
+				flag = true;
 			}
 		}
 		
