@@ -54,7 +54,7 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 	    	}
 	    }
 	};
-	private int heat, maxHeat = 5000, castingProcess, meltingProcess, maxCasting, maxMelting, removeCount;
+	private int heat, maxHeat = 5000, castingProcess, meltingProcess, maxCasting, maxMelting, removeCount, tick;
 	private String tileEntityName;
 	
 	@Override
@@ -99,6 +99,7 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		this.maxCasting = compound.getInteger("MaxCasting");
 		this.maxHeat = compound.getInteger("MaxHeat");
 		this.removeCount = compound.getInteger("RemoveCount");
+		this.tick = compound.getInteger("Tick");
 		if(compound.hasKey("CustomName", 8)) setName(compound.getString("CustomName"));
 	}
 
@@ -114,13 +115,14 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		compound.setInteger("MaxCasting", (short)this.maxCasting);
 		compound.setInteger("MaxHeat", (short)this.maxHeat);
 		compound.setInteger("RemoveCount", (short)this.removeCount);
+		compound.setInteger("Tick", (short)this.tick);
 		if(this.hasCustomName()) compound.setString("CustomName", this.tileEntityName);
 		return compound;
 	}
 	
 	public boolean isHeating()
 	{
-		return this.heat > 0;
+		return this.getField(4) > 0;
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -132,27 +134,31 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 	@Override
 	public void update()
 	{
+		int tick = this.getField(7);
+		tick++;
+		this.setField(7, tick);
+		if(this.getField(7) >= 100) this.setField(7, 0);
+		
 		ItemStack[] input = new ItemStack[] {this.handler.getStackInSlot(0), this.handler.getStackInSlot(1)};
 		ItemStack output = FusionFurnaceRecipe.getInstance().getRecipesResult(input[0], input[1], 5000);
 		ItemStack slotFuel = this.handler.getStackInSlot(2);
 		boolean flag = false;
 		
 		if(this.isHeating())
-		{
+		{	
 			FusionFurnaceBlock.setState(true, world, pos);
+			flag = true;
 		}
 		
-		int buffer = this.heat;
-		this.heat = Math.max(0, Math.min(this.heat, this.maxHeat));
-		if(this.heat != buffer) flag = true;
-		
-		if(this.heat < this.maxHeat && !slotFuel.isEmpty())
+		int bufferHeat = this.getField(4);
+		if(this.getField(4) < this.getField(5) && !slotFuel.isEmpty())
 		{
 			int fuel = getItemBurnTime(slotFuel);
 			if(fuel > 0)
 			{
+				bufferHeat += fuel;
+				this.setField(4, bufferHeat);
 				Item item = slotFuel.getItem();
-				this.heat += fuel;
 				slotFuel.shrink(1);
 				flag = true;
 				
@@ -172,18 +178,30 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		
 		if(this.isHeating() && this.canSmelt())
 		{
-			this.maxCasting = FusionFurnaceRecipe.getInstance().getCastingProcess(output);
-			this.maxMelting = FusionFurnaceRecipe.getInstance().getCastingProcess(output) * 4;
+			this.setField(2, FusionFurnaceRecipe.getInstance().getCastingProcess(output));
+			this.setField(3, FusionFurnaceRecipe.getInstance().getMeltingProcess(output));
 			
-			this.meltingProcess++;
-			if(this.meltingProcess >= this.maxMelting)
+			int bufferMelting = this.getField(1);
+			int bufferCasting = this.getField(0);
+			int count = this.getField(6);
+			
+			if(this.getField(7) <= 0)
 			{
-				this.heat -= 50;
-				this.castingProcess++;
-				this.meltingProcess = 0;
+				bufferHeat -= 5;
+				this.setField(4, bufferHeat);
 			}
 			
-			if(this.castingProcess >= this.maxCasting)
+			bufferMelting++;
+			this.setField(1, bufferMelting);
+			if(this.getField(1) >= this.getField(3))
+			{
+				bufferCasting++;
+				this.setField(0, bufferCasting);
+				this.setField(1, 0);
+				flag= true;
+			}
+			
+			if(this.getField(0) >= this.getField(2))
 			{	
 				if(this.handler.getStackInSlot(3).getCount() > 0) this.handler.getStackInSlot(3).grow(1);
 				else if(!output.isEmpty()) this.handler.insertItem(3, output.copy(), false);
@@ -193,19 +211,22 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 				this.handler.setStackInSlot(0, input[0]);
 				this.handler.setStackInSlot(1, input[1]);
 				
-				this.removeCount++;
-				this.castingProcess = 0;
+				count++;
+				this.setField(6, count);
+				this.setField(0, 0);
+				flag = true;
 			}
 		}
 		else
 		{
-			this.castingProcess = 0;
-			this.meltingProcess = 0;
+			this.setField(0, 0);
+			this.setField(1, 0);
+			flag = true;
 		}
 		
-		if(this.removeCount > 0)
+		if(this.getField(6) > 0)
 		{
-			int i = this.removeCount;
+			int i = this.getField(6);
 			float f = FusionFurnaceRecipe.getInstance().getCraftingExp(output);
 			
 			if(f == 0.0F) i = 0;
@@ -228,37 +249,11 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 						world.spawnEntity(new EntityXPOrb(world, pos.getX(), pos.getY() + 0.5D, pos.getZ() + 0.5D, k));
 					}
 				}
-				this.removeCount = 0;
+				this.setField(6, 0);
 			}
 		}
 		
 		if(flag) this.markDirty();
-	}
-	
-	public void onCrafting(ItemStack stack)
-	{
-		if(!world.isRemote)
-		{
-			int i = this.removeCount;
-			float f = FusionFurnaceRecipe.getInstance().getCraftingExp(stack);
-			
-			if(f == 0.0F) i = 0;
-			else if(f < 1.0F)
-			{
-				int j = MathHelper.floor((float)i * f);
-				if(j < MathHelper.ceil((float)i * f) && Math.random() < (double)((float)i * f - (float)j)) j++;
-				i = j;
-			}
-			
-			int k = 0;
-			while(i > 0)
-			{
-				k = EntityXPOrb.getXPSplit(i);
-				i -= k;
-				world.spawnEntity(new EntityXPOrb(world, pos.getX(), pos.getY(), pos.getZ(), k));
-			}
-		}
-		this.removeCount = 0;
 	}
 	
 	private boolean canSmelt()
@@ -336,6 +331,8 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			return this.maxHeat;
 		case 6:
 			return this.removeCount;
+		case 7:
+			return this.tick;
 		default:
 			return 0;
 		}
@@ -346,10 +343,10 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		switch(id)
 		{
 		case 0:
-			if(value >= 0) this.castingProcess = value;
+			if(value >= 0) this.castingProcess = Math.min(value, this.maxCasting);
 			break;
 		case 1:
-			if(value >= 0) this.meltingProcess = value;
+			if(value >= 0) this.meltingProcess = Math.min(value, this.maxMelting);
 			break;
 		case 2:
 			if(value >= 0) this.maxCasting = value;
@@ -358,12 +355,16 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 			if(value >= 0) this.maxMelting = value;
 			break;
 		case 4:
-			if(value >= 0) this.heat = value;
+			if(value >= 0) this.heat = Math.min(value, this.maxHeat);
 			break;
 		case 5:
 			if(value >= 0) this.maxHeat = value;
+			break;
 		case 6:
 			if(value >= 0) this.removeCount = value;
+			break;
+		case 7:
+			if(value >= 0) this.tick = value;
 			break;
 		}
 	}

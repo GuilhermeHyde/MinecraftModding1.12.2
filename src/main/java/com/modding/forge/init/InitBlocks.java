@@ -28,8 +28,14 @@ public class InitBlocks
 	
 	private static Block createBlock(String name, Material material)
 	{
-		Block block = new Block(material).setUnlocalizedName(name).setRegistryName(Reference.location(name)).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
-		Item itemBlock = new ItemBlock(block).setRegistryName(Reference.location(name));
+		Block block = new Block(material);
+		block.setUnlocalizedName(name);
+		block.setRegistryName(Reference.location(name));
+		block.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+		
+		Item itemBlock = new ItemBlock(block);
+		itemBlock.setRegistryName(Reference.location(name));
+		
 		REGISTER_BLOCK.add(block);
 		REGISTER_ITEMBLOCK.add(itemBlock);
 		return block;
@@ -37,8 +43,14 @@ public class InitBlocks
 	
 	private static Block createFusionFurnace(String name)
 	{
-		Block block = new FusionFurnaceBlock().setUnlocalizedName(name).setRegistryName(Reference.location(name)).setCreativeTab(CreativeTabs.DECORATIONS);
-		Item itemBlock = new ItemBlock(block).setRegistryName(Reference.location(name));
+		Block block = new FusionFurnaceBlock();
+		block.setUnlocalizedName(name);
+		block.setRegistryName(Reference.location(name));
+		block.setCreativeTab(CreativeTabs.DECORATIONS);
+		
+		Item itemBlock = new ItemBlock(block);
+		itemBlock.setRegistryName(Reference.location(name));
+		
 		REGISTER_BLOCK.add(block);
 		REGISTER_ITEMBLOCK.add(itemBlock);
 		return block;

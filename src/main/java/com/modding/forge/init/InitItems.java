@@ -22,7 +22,12 @@ public class InitItems
 	
 	private static Item createItem(String name)
 	{
-		Item item = new Item().setUnlocalizedName(name).setRegistryName(Reference.location(name)).setCreativeTab(CreativeTabs.MATERIALS).setMaxStackSize(64);
+		Item item = new Item();
+		item.setUnlocalizedName(name);
+		item.setRegistryName(Reference.location(name));
+		item.setCreativeTab(CreativeTabs.MATERIALS);
+		item.setMaxStackSize(64);
+		
 		REGISTER_ITEMS.add(item);
 		return item;
 	}

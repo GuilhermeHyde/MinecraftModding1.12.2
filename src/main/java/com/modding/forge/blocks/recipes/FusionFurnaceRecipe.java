@@ -32,8 +32,8 @@ public class FusionFurnaceRecipe
 		addFusionRecipes(new ItemStack(InitItems.STEEL_INGOT), new ItemStack(InitItems.BRONZE_INGOT), 1725, 360, 10, new ItemStack(InitItems.TITANIUM_INGOT), 2.5F);
 		addFusionRecipes(new ItemStack(InitItems.TITANIUM_INGOT), new ItemStack(Items.BLAZE_POWDER), 3422, 400, 16, new ItemStack(InitItems.TUNGSTEN_INGOT), 4.0F);
 		addFusionRecipes(new ItemStack(InitItems.TITANIUM_INGOT), new ItemStack(Items.MAGMA_CREAM), 3422, 400, 16, new ItemStack(InitItems.ORICHALCUM_INGOT), 4.0F);
-		addFusionRecipes(new ItemStack(InitItems.TUNGSTEN_INGOT), new ItemStack(Items.DRAGON_BREATH), 5000, 480, 22, new ItemStack(InitItems.ADAMANTIUM_INGOT), 5.5F);
-		addFusionRecipes(new ItemStack(InitItems.ORICHALCUM_INGOT), new ItemStack(Items.DRAGON_BREATH), 5000, 480, 22, new ItemStack(InitItems.MITHRIL_INGOT), 5.5F);
+		addFusionRecipes(new ItemStack(InitItems.TUNGSTEN_INGOT), new ItemStack(Items.DRAGON_BREATH), 4989, 480, 22, new ItemStack(InitItems.ADAMANTIUM_INGOT), 5.5F);
+		addFusionRecipes(new ItemStack(InitItems.ORICHALCUM_INGOT), new ItemStack(Items.DRAGON_BREATH), 4989, 480, 22, new ItemStack(InitItems.MITHRIL_INGOT), 5.5F);
 	}
 	
 	private void addFusionRecipes(ItemStack input1, ItemStack input2, int heat, int melting, int casting, ItemStack result, float exp)
