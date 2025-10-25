@@ -4,7 +4,7 @@ import com.modding.forge.capability.interfaces.ICapabilityEntityStats;
 
 public class EntityStats implements ICapabilityEntityStats
 {
-	private float attackDamage, criticalDamage, moveSpeed, attackSpeed, healt, armorDefense, armorTougthness = 0.0F;
+	private float attackDamage, criticalDamage, moveSpeed, attackSpeed, armorDefense, armorTougthness = 0.0F;
 
 	@Override
 	public void setValue(int id, float value)
@@ -24,12 +24,9 @@ public class EntityStats implements ICapabilityEntityStats
 			this.attackSpeed = value;
 			break;
 		case 4:
-			this.healt = value;
-			break;
-		case 5:
 			this.armorDefense = value;
 			break;
-		case 6:
+		case 5:
 			this.armorTougthness = value;
 			break;
 			default:
@@ -51,10 +48,8 @@ public class EntityStats implements ICapabilityEntityStats
 		case 3:
 			return this.attackSpeed;
 		case 4:
-			return this.healt;
-		case 5:
 			return this.armorDefense;
-		case 6:
+		case 5:
 			return this.armorTougthness;
 			default:
 				return 0.0F;

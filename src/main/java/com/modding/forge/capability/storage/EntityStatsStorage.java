@@ -16,11 +16,10 @@ public class EntityStatsStorage implements IStorage<EntityStats>
 		NBTTagCompound tag = new NBTTagCompound();
 		tag.setFloat("AttackDamage", instance.getValue(0));
 		tag.setFloat("CriticalDamage", instance.getValue(1));
-		tag.setFloat("Healt", instance.getValue(2));
-		tag.setFloat("MoveSpeed", instance.getValue(3));
-		tag.setFloat("AttackSpeed", instance.getValue(4));
-		tag.setFloat("ArmorDefense", instance.getValue(5));
-		tag.setFloat("ArmorTougthness", instance.getValue(6));
+		tag.setFloat("MoveSpeed", instance.getValue(2));
+		tag.setFloat("AttackSpeed", instance.getValue(3));
+		tag.setFloat("ArmorDefense", instance.getValue(4));
+		tag.setFloat("ArmorTougthness", instance.getValue(5));
 		return tag;
 	}
 
@@ -32,8 +31,7 @@ public class EntityStatsStorage implements IStorage<EntityStats>
 		instance.setValue(1, tag.getFloat("CriticalDamage"));
 		instance.setValue(2, tag.getFloat("MoveSpeed"));
 		instance.setValue(3, tag.getFloat("AttackSpeed"));
-		instance.setValue(4, tag.getFloat("Healt"));
-		instance.setValue(5, tag.getFloat("ArmorDefense"));
-		instance.setValue(6, tag.getFloat("ArmorTougthness"));
+		instance.setValue(4, tag.getFloat("ArmorDefense"));
+		instance.setValue(5, tag.getFloat("ArmorTougthness"));
 	}
 }

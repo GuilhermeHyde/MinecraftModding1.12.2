@@ -6,6 +6,8 @@ import com.modding.forge.capability.provider.EntityStatsProvider;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.util.CombatRules;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -25,8 +27,8 @@ public class ModEventHandler
 	@SubscribeEvent
 	public void onLivingAttack(LivingHurtEvent event)
 	{
-		Entity source = event.getSource().getTrueSource();
-		if(source instanceof EntityLivingBase)
+		Entity damage = event.getSource().getTrueSource();
+		if(damage instanceof EntityLivingBase)
 		{
 			EntityLivingBase attacker = (EntityLivingBase)event.getSource().getTrueSource();
 			EntityStats stats = attacker.getCapability(EntityStatsProvider.ENTITY_STATS_CAP, null);
@@ -34,8 +36,25 @@ public class ModEventHandler
 			if(stats != null)
 			{
 				stats.setValue(0, 1);
-				float damage = stats.getValue(0);
-				event.setAmount(event.getAmount() + damage);
+				float value = event.getAmount() + stats.getValue(0);
+				event.setAmount(value);
+			}
+		}
+		
+		Entity defense = event.getEntityLiving();
+		if(defense instanceof EntityLivingBase)
+		{
+			EntityLivingBase target = (EntityLivingBase)event.getEntityLiving();
+			EntityStats stats = target.getCapability(EntityStatsProvider.ENTITY_STATS_CAP, null);
+			
+			if(stats != null)
+			{
+				stats.setValue(4, 0);
+				stats.setValue(5, 0);
+				float armorDefense = target.getTotalArmorValue() + stats.getValue(5);
+				float armorTorghness = (float)target.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS).getAttributeValue() + stats.getValue(6);
+				float value = CombatRules.getDamageAfterAbsorb(event.getAmount(), armorDefense, armorTorghness);
+				event.setAmount(value);
 			}
 		}
 	}
