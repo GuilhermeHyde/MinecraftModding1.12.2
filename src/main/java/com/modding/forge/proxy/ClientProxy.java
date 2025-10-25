@@ -1,5 +1,6 @@
 package com.modding.forge.proxy;
 
+import com.modding.forge.event.ModEventHandler;
 import com.modding.forge.proxy.renders.BlockRendering;
 import com.modding.forge.proxy.renders.ItemRendering;
 
@@ -21,6 +22,7 @@ public class ClientProxy extends CommonProxy
 	public void init(FMLInitializationEvent event)
 	{
 		super.init(event);
+		register(new ModEventHandler());
 	}
 	
 	@Override

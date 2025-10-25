@@ -98,8 +98,6 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		this.maxMelting = compound.getInteger("MaxMelting");
 		this.maxCasting = compound.getInteger("MaxCasting");
 		this.maxHeat = compound.getInteger("MaxHeat");
-		this.removeCount = compound.getInteger("RemoveCount");
-		this.tick = compound.getInteger("Tick");
 		if(compound.hasKey("CustomName", 8)) setName(compound.getString("CustomName"));
 	}
 
@@ -114,8 +112,6 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 		compound.setInteger("MaxMelting", (short)this.maxMelting);
 		compound.setInteger("MaxCasting", (short)this.maxCasting);
 		compound.setInteger("MaxHeat", (short)this.maxHeat);
-		compound.setInteger("RemoveCount", (short)this.removeCount);
-		compound.setInteger("Tick", (short)this.tick);
 		if(this.hasCustomName()) compound.setString("CustomName", this.tileEntityName);
 		return compound;
 	}
@@ -134,15 +130,19 @@ public class TileEntityFusionFurnace extends TileEntity implements ITickable
 	@Override
 	public void update()
 	{
-		int tick = this.getField(7);
-		tick++;
-		this.setField(7, tick);
-		if(this.getField(7) >= 100) this.setField(7, 0);
-		
 		ItemStack[] input = new ItemStack[] {this.handler.getStackInSlot(0), this.handler.getStackInSlot(1)};
 		ItemStack output = FusionFurnaceRecipe.getInstance().getRecipesResult(input[0], input[1], 5000);
 		ItemStack slotFuel = this.handler.getStackInSlot(2);
 		boolean flag = false;
+		
+		int tick = this.getField(7);
+		tick++;
+		this.setField(7, tick);
+		if(this.getField(7) >= 100)
+		{
+			this.setField(7, 0);
+			flag = true;
+		}
 		
 		if(this.isHeating())
 		{	

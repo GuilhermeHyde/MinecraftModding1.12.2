@@ -1,0 +1,39 @@
+package com.modding.forge.capability.storage;
+
+import com.modding.forge.capability.EntityStats;
+
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.Capability.IStorage;
+
+public class EntityStatsStorage implements IStorage<EntityStats>
+{
+	@Override
+	public NBTBase writeNBT(Capability<EntityStats> capability, EntityStats instance, EnumFacing side)
+	{
+		NBTTagCompound tag = new NBTTagCompound();
+		tag.setFloat("AttackDamage", instance.getValue(0));
+		tag.setFloat("CriticalDamage", instance.getValue(1));
+		tag.setFloat("Healt", instance.getValue(2));
+		tag.setFloat("MoveSpeed", instance.getValue(3));
+		tag.setFloat("AttackSpeed", instance.getValue(4));
+		tag.setFloat("ArmorDefense", instance.getValue(5));
+		tag.setFloat("ArmorTougthness", instance.getValue(6));
+		return tag;
+	}
+
+	@Override
+	public void readNBT(Capability<EntityStats> capability, EntityStats instance, EnumFacing side, NBTBase nbt)
+	{
+		NBTTagCompound tag = (NBTTagCompound) nbt;
+		instance.setValue(0, tag.getFloat("AttackDamage"));
+		instance.setValue(1, tag.getFloat("CriticalDamage"));
+		instance.setValue(2, tag.getFloat("MoveSpeed"));
+		instance.setValue(3, tag.getFloat("AttackSpeed"));
+		instance.setValue(4, tag.getFloat("Healt"));
+		instance.setValue(5, tag.getFloat("ArmorDefense"));
+		instance.setValue(6, tag.getFloat("ArmorTougthness"));
+	}
+}

@@ -1,11 +1,15 @@
 package com.modding.forge.registry;
 
 import com.modding.forge.Main;
+import com.modding.forge.capability.EntityStats;
+import com.modding.forge.capability.storage.EntityStatsStorage;
 import com.modding.forge.init.InitBlocks;
 import com.modding.forge.init.InitItems;
+import com.modding.forge.network.ModNetworkingManager;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -38,6 +42,8 @@ public class ModRegistryEvent
 	
 	public static void init(FMLInitializationEvent event)
 	{
+		ModNetworkingManager.initialization();
+		CapabilityManager.INSTANCE.register(EntityStats.class, new EntityStatsStorage(), EntityStats :: new);
 		NetworkRegistry.INSTANCE.registerGuiHandler(Main.instance, new GuiHandler());
 	}
 	
