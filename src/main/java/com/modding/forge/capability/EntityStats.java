@@ -4,8 +4,8 @@ import com.modding.forge.capability.interfaces.ICapabilityEntityStats;
 
 public class EntityStats implements ICapabilityEntityStats
 {
-	private float attackDamage, criticalDamage, moveSpeed, attackSpeed, armorDefense, armorTougthness = 0.0F;
-
+	private float attackDamage, criticalDamage, moveSpeed, attackSpeed, armorDefense, armorTougthness;
+	
 	@Override
 	public void setValue(int id, float value)
 	{
