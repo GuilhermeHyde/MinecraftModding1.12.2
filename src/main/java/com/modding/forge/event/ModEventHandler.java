@@ -19,11 +19,12 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class ModEventHandler
 {
-	private static final UUID SPEED_MODIFIER_UUID = UUID.fromString("6E941920-1F2F-4A9B-B1D6-11B5A4B29E30");
-	private static final UUID ATTACK_SPEED_MODIFIER_UUID = UUID.fromString("6E941920-1F2F-4A9B-B1D6-11B5A4B29E30");
+	private static final UUID MOVESPEED_MODIFIER_UUID = UUID.fromString("6E941920-1F2F-4A9B-B1D6-11B5A4B29E30");
+	private static final UUID ATTACKSPEED_MODIFIER_UUID = UUID.fromString("6E941920-1F2F-4A9B-B1D6-11B5A4B29E30");
 	
 	@SubscribeEvent
 	public void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event)
@@ -37,30 +38,24 @@ public class ModEventHandler
 	@SubscribeEvent
 	public void onLivingHurt(LivingHurtEvent event)
 	{
-		Entity damage = event.getSource().getTrueSource();
-		if(damage instanceof EntityLivingBase)
+		Entity entity = event.getSource().getTrueSource();
+		if(entity instanceof EntityLivingBase)
 		{
-			EntityLivingBase attacker = (EntityLivingBase)event.getSource().getTrueSource();
-			EntityStats stats = attacker.getCapability(EntityStatsProvider.ENTITY_STATS_CAP, null);
+			EntityLivingBase entityLiving = (EntityLivingBase)event.getSource().getTrueSource();
+			EntityStats stats = entityLiving.getCapability(EntityStatsProvider.ENTITY_STATS_CAP, null);
 			
 			if(stats != null)
 			{
-				float value = event.getAmount() + stats.getValue(0);
-				event.setAmount(value);
-			}
-		}
-		
-		Entity defense = event.getEntityLiving();
-		if(defense instanceof EntityLivingBase)
-		{
-			EntityLivingBase target = (EntityLivingBase)event.getEntityLiving();
-			EntityStats stats = target.getCapability(EntityStatsProvider.ENTITY_STATS_CAP, null);
-			
-			if(stats != null)
-			{
-				float armorDefense = target.getTotalArmorValue() + stats.getValue(4);
-				float armorTorghness = (float)target.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS).getAttributeValue() + stats.getValue(5);
-				float value = CombatRules.getDamageAfterAbsorb(event.getAmount(), armorDefense, armorTorghness);
+				float statsDamage = 1 + stats.getValue(0) / 100F;
+				float damage = event.getAmount() * statsDamage;
+				
+				float statsDefense = 1 + stats.getValue(4) / 100F;
+				float armorDefense = entityLiving.getTotalArmorValue() * statsDefense;
+				
+				float statsTorghness = 1 + stats.getValue(5) / 100F;
+				float armorTorghness = (float)entityLiving.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS).getAttributeValue() * statsTorghness;
+				
+				float value = CombatRules.getDamageAfterAbsorb(damage, armorDefense, armorTorghness);
 				event.setAmount(value);
 			}
 		}
@@ -74,7 +69,8 @@ public class ModEventHandler
 		
 		if(stats != null)
 		{
-			if(event.isVanillaCritical()) event.setDamageModifier(1.5F + stats.getValue(1));
+			float statsCritical = 1 + stats.getValue(1) / 100F;
+			if(event.isVanillaCritical()) event.setDamageModifier(1.5F * statsCritical);
 		}
 	}
 	
@@ -86,21 +82,43 @@ public class ModEventHandler
 		
 		if(stats != null)
 		{
-			double moveSpeed = stats.getValue(2);
+			double moveSpeed = stats.getValue(2) / 100F;
 			IAttributeInstance speedAttribute = entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
-			AttributeModifier speedModifier = speedAttribute.getModifier(SPEED_MODIFIER_UUID);
+			AttributeModifier speedModifier = speedAttribute.getModifier(MOVESPEED_MODIFIER_UUID);
 			
-			if(speedModifier == null)speedAttribute.applyModifier(new AttributeModifier(SPEED_MODIFIER_UUID, "CustomSpeed", moveSpeed, 2));
-			else if(speedModifier.getAmount() != moveSpeed) speedAttribute.removeModifier(SPEED_MODIFIER_UUID);
-			
-			if(entity instanceof EntityPlayer)
+			if(speedModifier == null || speedModifier.getAmount() != moveSpeed)
 			{
-				double attackSpeed = stats.getValue(3);
-				IAttributeInstance attackAttribute = entity.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED);
-				AttributeModifier attackModifier = attackAttribute.getModifier(ATTACK_SPEED_MODIFIER_UUID);
-				
-				if(attackModifier == null)attackAttribute.applyModifier(new AttributeModifier(ATTACK_SPEED_MODIFIER_UUID, "CustomAttack", attackSpeed, 2));
-				else if(attackModifier.getAmount() != attackSpeed) attackAttribute.removeModifier(ATTACK_SPEED_MODIFIER_UUID);
+				if(speedModifier != null)speedAttribute.removeModifier(MOVESPEED_MODIFIER_UUID);
+				speedAttribute.applyModifier(new AttributeModifier(MOVESPEED_MODIFIER_UUID, "CustomSpeed", moveSpeed, 2));
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onPlayerUpdate(TickEvent.PlayerTickEvent event)
+	{
+		EntityStats stats = event.player.getCapability(EntityStatsProvider.ENTITY_STATS_CAP, null);
+		
+		double attackSpeed = stats.getValue(3) / 100F;
+		IAttributeInstance attackAttribute = event.player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED);
+		AttributeModifier attackModifier = attackAttribute.getModifier(ATTACKSPEED_MODIFIER_UUID);
+		
+		double moveSpeed = stats.getValue(2) / 100F;
+		IAttributeInstance speedAttribute = event.player.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
+		AttributeModifier speedModifier = speedAttribute.getModifier(MOVESPEED_MODIFIER_UUID);
+		
+		if(stats != null)
+		{
+			if(speedModifier == null || speedModifier.getAmount() != moveSpeed)
+			{
+				if(speedModifier != null)speedAttribute.removeModifier(MOVESPEED_MODIFIER_UUID);
+				speedAttribute.applyModifier(new AttributeModifier(MOVESPEED_MODIFIER_UUID, "CustomPlayerSpeed", moveSpeed, 2));
+			}
+			
+			if(attackModifier == null || attackModifier.getAmount() != attackSpeed)
+			{
+				if(attackModifier != null)attackAttribute.removeModifier(ATTACKSPEED_MODIFIER_UUID);
+				attackAttribute.applyModifier(new AttributeModifier(ATTACKSPEED_MODIFIER_UUID, "CustomPlayerAttack", attackSpeed, 2));
 			}
 		}
 	}
