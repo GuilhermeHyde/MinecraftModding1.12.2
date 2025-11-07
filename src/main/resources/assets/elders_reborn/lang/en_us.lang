@@ -7,6 +7,13 @@ item.tungsten_ingot.name=Tungsten Ingot
 item.mithril_ingot.name=Mithril Ingot
 item.orichalcum_ingot.name=Orichalcum Ingot
 
+item.iron_ring.name=Iron Ring
+item.iron_necklace.name=Iron Necklace
+item.diamond_ring.name=Diamond Ring
+item.diamond_necklace.name=Diamond Necklace
+item.emerald_ring.name=Emerald Ring
+item.emerald_necklace.name=Emerald Necklace
+
 #Blocks
 tile.bronze_block.name=Bronze Block
 tile.steel_block.name=Steel Block

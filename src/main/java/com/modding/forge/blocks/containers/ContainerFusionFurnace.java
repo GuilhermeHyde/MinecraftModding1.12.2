@@ -1,5 +1,7 @@
 package com.modding.forge.blocks.containers;
 
+import javax.annotation.Nonnull;
+
 import com.modding.forge.blocks.recipes.FusionFurnaceRecipe;
 import com.modding.forge.blocks.tilentities.TileEntityFusionFurnace;
 
@@ -25,8 +27,24 @@ public class ContainerFusionFurnace extends Container
 		
 		this.addSlotToContainer(new SlotItemHandler(handler, 0, 30, 25)); //input1
 		this.addSlotToContainer(new SlotItemHandler(handler, 1, 71, 25)); //input2
-		this.addSlotToContainer(new SlotItemHandler(handler, 2, 17, 53)); //fuel
-		this.addSlotToContainer(new SlotItemHandler(handler, 3, 128, 25)); //output
+		
+		this.addSlotToContainer(new SlotItemHandler(handler, 2, 17, 53)
+		{
+			@Override
+			public boolean isItemValid(@Nonnull ItemStack stack)
+			{
+				return TileEntityFusionFurnace.isItemFuel(stack);
+			}
+		}); //fuel
+		
+		this.addSlotToContainer(new SlotItemHandler(handler, 3, 128, 25)
+		{
+			@Override
+			public boolean isItemValid(@Nonnull ItemStack stack)
+			{
+				return false;
+			}
+		}); //output
 		
 		for(int y = 0; y < 3; y++)
 		{

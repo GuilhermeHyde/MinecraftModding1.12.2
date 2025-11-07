@@ -5,7 +5,11 @@ import java.util.UUID;
 import com.modding.forge.Reference;
 import com.modding.forge.capability.EntityStats;
 import com.modding.forge.capability.provider.EntityStatsProvider;
+import com.modding.forge.containers.inventory.InventoryAccessory;
+import com.modding.forge.gui.GuiInventoryAccessory;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -14,6 +18,7 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.CombatRules;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -121,5 +126,15 @@ public class ModEventHandler
 				attackAttribute.applyModifier(new AttributeModifier(ATTACKSPEED_MODIFIER_UUID, "CustomPlayerAttack", attackSpeed, 2));
 			}
 		}
+	}
+	
+	@SubscribeEvent
+	public void onGuiOpen(GuiOpenEvent event)
+	{
+	    if (event.getGui() instanceof GuiInventory)
+	    {
+	        EntityPlayer player = Minecraft.getMinecraft().player;
+	        if(!player.isCreative())event.setGui(new GuiInventoryAccessory(new InventoryAccessory(), player)); 
+	    }
 	}
 }

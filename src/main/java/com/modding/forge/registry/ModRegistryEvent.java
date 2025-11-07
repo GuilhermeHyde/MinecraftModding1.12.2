@@ -9,6 +9,8 @@ import com.modding.forge.network.ModNetworkingManager;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -32,7 +34,16 @@ public class ModRegistryEvent
 	public static void onRegisterItemEvent(RegistryEvent.Register<Item> event)
 	{
 		event.getRegistry().registerAll(InitItems.REGISTER_ITEMS.toArray(new Item[0]));
+		event.getRegistry().registerAll(InitItems.REGISTER_ACCESSORY.toArray(new Item[0]));
 		event.getRegistry().registerAll(InitBlocks.REGISTER_ITEMBLOCK.toArray(new Item[0]));
+	}
+	
+	@SubscribeEvent
+	public static void onTextureStitch(TextureStitchEvent.Pre event)
+	{
+	    event.getMap().registerSprite(new ResourceLocation("elders_reborn:items/empty_ring"));
+	    event.getMap().registerSprite(new ResourceLocation("elders_reborn:items/empty_necklace"));
+	    event.getMap().registerSprite(new ResourceLocation("elders_reborn:items/empty_hand"));
 	}
 	
 	public static void preInit(FMLPreInitializationEvent event)

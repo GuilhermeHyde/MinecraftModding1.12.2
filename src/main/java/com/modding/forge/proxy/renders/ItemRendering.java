@@ -20,6 +20,12 @@ public class ItemRendering
 		{
 			if(!itemList.isEmpty()) register(itemList.get(i));
 		}
+		
+		List<Item> accessoryList = InitItems.REGISTER_ACCESSORY;
+		for(int j = 0; j < accessoryList.size(); j++)
+		{
+			if(!accessoryList.isEmpty()) register(accessoryList.get(j));
+		}
 	}
 	
 	private static void register(Item item)

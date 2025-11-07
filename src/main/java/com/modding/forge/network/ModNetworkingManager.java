@@ -1,6 +1,8 @@
 package com.modding.forge.network;
 
 import com.modding.forge.Reference;
+import com.modding.forge.network.packets.EntityLevelPacket.EntityLevelHandler;
+import com.modding.forge.network.packets.EntityLevelPacket;
 import com.modding.forge.network.packets.EntityStatsPacket;
 import com.modding.forge.network.packets.EntityStatsPacket.EntityStatsHandler;
 
@@ -16,5 +18,6 @@ public class ModNetworkingManager
 	public static void initialization()
 	{
 		INSTANCE.registerMessage(EntityStatsHandler.class, EntityStatsPacket.class, packetID++, Side.CLIENT);
+		INSTANCE.registerMessage(EntityLevelHandler.class, EntityLevelPacket.class, packetID++, Side.CLIENT);
 	}
 }

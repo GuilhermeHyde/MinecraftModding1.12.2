@@ -4,6 +4,9 @@ import com.modding.forge.Reference;
 import com.modding.forge.blocks.containers.ContainerFusionFurnace;
 import com.modding.forge.blocks.gui.FusionFurnaceGui;
 import com.modding.forge.blocks.tilentities.TileEntityFusionFurnace;
+import com.modding.forge.containers.ContainerInventoryAccessory;
+import com.modding.forge.containers.inventory.InventoryAccessory;
+import com.modding.forge.gui.GuiInventoryAccessory;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
@@ -16,6 +19,7 @@ public class GuiHandler implements IGuiHandler
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
 	{
 		if(ID == Reference.FUSION_FURNACE_GUI) return new ContainerFusionFurnace(player.inventory, (TileEntityFusionFurnace)world.getTileEntity(new BlockPos(x, y, z)));
+		if(ID == Reference.INVENTORY_ACCESSORY) return new ContainerInventoryAccessory(new InventoryAccessory(), player);
 		return null;
 	}
 
@@ -23,6 +27,7 @@ public class GuiHandler implements IGuiHandler
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
 	{
 		if(ID == Reference.FUSION_FURNACE_GUI) return new FusionFurnaceGui(player.inventory, (TileEntityFusionFurnace)world.getTileEntity(new BlockPos(x, y, z)));
+		if(ID == Reference.INVENTORY_ACCESSORY) return new GuiInventoryAccessory(new InventoryAccessory(), player);
 		return null;
 	}
 }

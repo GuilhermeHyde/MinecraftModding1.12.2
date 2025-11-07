@@ -1,7 +1,5 @@
 package com.modding.forge.blocks.tilentities;
 
-import javax.annotation.Nonnull;
-
 import com.modding.forge.blocks.FusionFurnaceBlock;
 import com.modding.forge.blocks.recipes.FusionFurnaceRecipe;
 
@@ -34,26 +32,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 public class TileEntityFusionFurnace extends TileEntity implements ITickable
 {
-	public final ItemStackHandler handler = new ItemStackHandler(4)
-	{
-	    @Override
-	    public boolean isItemValid(int slot, @Nonnull ItemStack stack)
-	    {
-	    	switch(slot)
-	    	{
-	    	case 0:
-	    		return true;
-	    	case 1:
-	    		return true;
-	    	case 2:
-	    		return isItemFuel(stack);
-	    	case 3:
-	    		return false;
-	    		default:
-	    			return true;
-	    	}
-	    }
-	};
+	public final ItemStackHandler handler = new ItemStackHandler(4);
 	private int heat, maxHeat = 5000, castingProcess, meltingProcess, maxCasting, maxMelting, removeCount, tick;
 	private String tileEntityName;
 	

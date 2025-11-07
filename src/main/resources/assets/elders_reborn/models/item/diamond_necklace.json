@@ -1,0 +1,7 @@
+{
+	"parent": "item/generated",
+	"textures":
+	{
+		"layer0": "elders_reborn:items/diamond_necklace"
+	}
+}
