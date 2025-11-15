@@ -1,4 +1,4 @@
-package com.modding.forge.items;
+package com.modding.forge.items.interfaces;
 
 public interface IAccessory
 {

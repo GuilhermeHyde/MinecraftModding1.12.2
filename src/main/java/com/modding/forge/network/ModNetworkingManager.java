@@ -1,10 +1,14 @@
 package com.modding.forge.network;
 
 import com.modding.forge.Reference;
-import com.modding.forge.network.packets.EntityLevelPacket.EntityLevelHandler;
-import com.modding.forge.network.packets.EntityLevelPacket;
-import com.modding.forge.network.packets.EntityStatsPacket;
-import com.modding.forge.network.packets.EntityStatsPacket.EntityStatsHandler;
+import com.modding.forge.network.packets.CapabilityAccessoryPacket;
+import com.modding.forge.network.packets.CapabilityAccessoryPacket.CapabilityAccessoryHandler;
+import com.modding.forge.network.packets.CapabilityLevelPacket;
+import com.modding.forge.network.packets.CapabilityLevelPacket.CapabilityLevelHandler;
+import com.modding.forge.network.packets.CapabilityStatsPacket;
+import com.modding.forge.network.packets.CapabilityStatsPacket.CapabilityStatsHandler;
+import com.modding.forge.network.packets.OpenContainerPacket;
+import com.modding.forge.network.packets.OpenContainerPacket.OpenContainerHandler;
 
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -17,7 +21,9 @@ public class ModNetworkingManager
 	
 	public static void initialization()
 	{
-		INSTANCE.registerMessage(EntityStatsHandler.class, EntityStatsPacket.class, packetID++, Side.CLIENT);
-		INSTANCE.registerMessage(EntityLevelHandler.class, EntityLevelPacket.class, packetID++, Side.CLIENT);
+		INSTANCE.registerMessage(CapabilityStatsHandler.class, CapabilityStatsPacket.class, packetID++, Side.CLIENT);
+		INSTANCE.registerMessage(CapabilityLevelHandler.class, CapabilityLevelPacket.class, packetID++, Side.CLIENT);
+		INSTANCE.registerMessage(CapabilityAccessoryHandler.class, CapabilityAccessoryPacket.class, packetID++, Side.CLIENT);
+		INSTANCE.registerMessage(OpenContainerHandler.class, OpenContainerPacket.class, packetID++, Side.SERVER);
 	}
 }

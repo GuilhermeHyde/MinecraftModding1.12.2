@@ -2,14 +2,23 @@ package com.modding.forge.event;
 
 import java.util.UUID;
 
+import org.lwjgl.input.Keyboard;
+
+import com.modding.forge.Main;
 import com.modding.forge.Reference;
-import com.modding.forge.capability.EntityStats;
-import com.modding.forge.capability.provider.EntityStatsProvider;
-import com.modding.forge.containers.inventory.InventoryAccessory;
-import com.modding.forge.gui.GuiInventoryAccessory;
+import com.modding.forge.capability.CapabilityAccessory;
+import com.modding.forge.capability.CapabilityStats;
+import com.modding.forge.capability.provider.CapabilityAccessoryProvider;
+import com.modding.forge.capability.provider.CapabilityStatsProvider;
+import com.modding.forge.containers.ContainerAccessory;
+import com.modding.forge.gui.GuiAccessory;
+import com.modding.forge.network.ModNetworkingManager;
+import com.modding.forge.network.packets.OpenContainerPacket;
+import com.modding.forge.proxy.ModKeybinds;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -24,6 +33,7 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class ModEventHandler
@@ -36,7 +46,12 @@ public class ModEventHandler
 	{
 		if(event.getObject() instanceof EntityLivingBase)
 		{
-			event.addCapability(new ResourceLocation(Reference.modID(), "entity_stats"), new EntityStatsProvider());
+			event.addCapability(new ResourceLocation(Reference.modID(), "entity_stats"), new CapabilityStatsProvider());
+		}
+		
+		if(event.getObject() instanceof EntityPlayer)
+		{
+			event.addCapability(new ResourceLocation(Reference.modID(), "inventory_accessory"), new CapabilityAccessoryProvider());
 		}
 	}
 	
@@ -47,7 +62,7 @@ public class ModEventHandler
 		if(entity instanceof EntityLivingBase)
 		{
 			EntityLivingBase entityLiving = (EntityLivingBase)event.getSource().getTrueSource();
-			EntityStats stats = entityLiving.getCapability(EntityStatsProvider.ENTITY_STATS_CAP, null);
+			CapabilityStats stats = entityLiving.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
 			
 			if(stats != null)
 			{
@@ -70,7 +85,7 @@ public class ModEventHandler
 	public void onCriticalHit(CriticalHitEvent event)
 	{
 		EntityPlayer player = event.getEntityPlayer();
-		EntityStats stats = player.getCapability(EntityStatsProvider.ENTITY_STATS_CAP, null);
+		CapabilityStats stats = player.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
 		
 		if(stats != null)
 		{
@@ -83,7 +98,7 @@ public class ModEventHandler
 	public void onLivingUpdate(LivingUpdateEvent event)
 	{
 		EntityLivingBase entity = (EntityLivingBase)event.getEntityLiving();
-		EntityStats stats = entity.getCapability(EntityStatsProvider.ENTITY_STATS_CAP, null);
+		CapabilityStats stats = entity.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
 		
 		if(stats != null)
 		{
@@ -102,7 +117,8 @@ public class ModEventHandler
 	@SubscribeEvent
 	public void onPlayerUpdate(TickEvent.PlayerTickEvent event)
 	{
-		EntityStats stats = event.player.getCapability(EntityStatsProvider.ENTITY_STATS_CAP, null);
+		EntityPlayer player = event.player;
+		CapabilityStats stats = event.player.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
 		
 		double attackSpeed = stats.getValue(3) / 100F;
 		IAttributeInstance attackAttribute = event.player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED);
@@ -129,12 +145,17 @@ public class ModEventHandler
 	}
 	
 	@SubscribeEvent
-	public void onGuiOpen(GuiOpenEvent event)
+	public void onKeyInputEvent(InputEvent.KeyInputEvent event)
 	{
-	    if (event.getGui() instanceof GuiInventory)
-	    {
-	        EntityPlayer player = Minecraft.getMinecraft().player;
-	        if(!player.isCreative())event.setGui(new GuiInventoryAccessory(new InventoryAccessory(), player)); 
-	    }
+		if (Minecraft.getMinecraft().player != null)
+		{
+			if (ModKeybinds.keyBindingAccessories.isPressed())
+			{
+				if (Minecraft.getMinecraft().currentScreen == null)
+				{
+					ModNetworkingManager.INSTANCE.sendToServer(new OpenContainerPacket(Reference.INVENTORY_ACCESSORY));
+				}
+			}
+		}
 	}
 }

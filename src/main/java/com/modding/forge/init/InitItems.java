@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.modding.forge.Reference;
-import com.modding.forge.items.IAccessory.EnumAccessoryType;
 import com.modding.forge.items.ItemAccessory;
+import com.modding.forge.items.interfaces.IAccessory.EnumAccessoryType;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;

@@ -1,0 +1,72 @@
+package com.modding.forge.containers;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import com.modding.forge.capability.provider.CapabilityAccessoryProvider;
+import com.modding.forge.network.ModNetworkingManager;
+import com.modding.forge.network.packets.CapabilityAccessoryPacket;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ContainerPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.items.IItemHandler;
+
+public class ContainerAccessory extends ContainerPlayer
+{
+	public ContainerAccessory(EntityPlayer player)
+	{
+		super(player.inventory, !player.world.isRemote, player);
+		
+		IItemHandler handler = player.getCapability(CapabilityAccessoryProvider.INVENTORY_ACCESSORY_CAP, null);
+    	for(int i = 0; i < 3; i++)
+    	{
+    		if(i == 0)
+    		{
+    			this.addSlotToContainer(new SlotItemHandler(handler, i, 77, 8 + 18 * i)
+    			{
+    	            @Nullable
+    	            @SideOnly(Side.CLIENT)
+    	            public String getSlotTexture()
+    	            {
+    	                return "elders_reborn:items/empty_necklace";
+    	            }
+    	            
+    	            @Override
+    	            public void onSlotChange(@Nonnull ItemStack p_75220_1_, @Nonnull ItemStack p_75220_2_)
+    	            {
+    	            	ModNetworkingManager.INSTANCE.sendToAll(new CapabilityAccessoryPacket(player.getEntityId(), player.serializeNBT()));
+    	            }
+    			});
+    		}
+    		else
+    		{
+    			this.addSlotToContainer(new SlotItemHandler(handler, i, 77, 8 + 18 * i)
+    			{
+    	            @Nullable
+    	            @SideOnly(Side.CLIENT)
+    	            public String getSlotTexture()
+    	            {
+    	                return "elders_reborn:items/empty_ring";
+    	            }
+    			});
+    		}
+    	}
+	}
+    
+    @Override
+    public boolean canInteractWith(EntityPlayer playerIn)
+    {
+        return true;
+    }
+	
+	@Override
+    public ItemStack transferStackInSlot(EntityPlayer player, int index)
+    {
+    	return super.transferStackInSlot(player, index);
+    }
+}

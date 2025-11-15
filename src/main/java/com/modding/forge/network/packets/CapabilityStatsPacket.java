@@ -1,6 +1,7 @@
 package com.modding.forge.network.packets;
 
-import com.modding.forge.capability.provider.EntityStatsProvider;
+import com.modding.forge.capability.CapabilityStats;
+import com.modding.forge.capability.provider.CapabilityStatsProvider;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -11,15 +12,15 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class EntityStatsPacket implements IMessage
+public class CapabilityStatsPacket implements IMessage
 {
 	private NBTTagCompound data;
 	private int entityID;
 	
-	public EntityStatsPacket() {}
-	public EntityStatsPacket(int id, NBTTagCompound nbt)
+	public CapabilityStatsPacket() {}
+	public CapabilityStatsPacket(int id, NBTTagCompound data)
 	{
-		this.data = nbt;
+		this.data = data;
 		this.entityID = id;
 	}
 	
@@ -37,10 +38,10 @@ public class EntityStatsPacket implements IMessage
 		ByteBufUtils.writeTag(buf, data);
 	}
 	
-	public static class EntityStatsHandler implements IMessageHandler<EntityStatsPacket, IMessage>
+	public static class CapabilityStatsHandler implements IMessageHandler<CapabilityStatsPacket, IMessage>
 	{
 		@Override
-		public IMessage onMessage(EntityStatsPacket message, MessageContext ctx)
+		public IMessage onMessage(CapabilityStatsPacket message, MessageContext ctx)
 		{
 			if(ctx.side.isClient())
 			{
@@ -49,8 +50,8 @@ public class EntityStatsPacket implements IMessage
 					Entity entity = Minecraft.getMinecraft().world.getEntityByID(message.entityID);
 					if(entity != null)
 					{
-						entity.getCapability(EntityStatsProvider.ENTITY_STATS_CAP, null);
-						entity.deserializeNBT(message.data);
+						CapabilityStats capability = entity.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
+						if(capability != null) entity.deserializeNBT(message.data);
 					}
 				});
 			}

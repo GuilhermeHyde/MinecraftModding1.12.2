@@ -1,8 +1,8 @@
 package com.modding.forge.capability;
 
-import com.modding.forge.capability.interfaces.ICapabilityEntityStats;
+import com.modding.forge.capability.interfaces.ICapabilityMod;
 
-public class EntityStats implements ICapabilityEntityStats
+public class CapabilityStats implements ICapabilityMod
 {
 	private float attackDamage, criticalDamage, moveSpeed, attackSpeed, armorDefense, armorTougthness;
 	

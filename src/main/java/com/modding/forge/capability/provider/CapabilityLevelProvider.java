@@ -1,6 +1,6 @@
 package com.modding.forge.capability.provider;
 
-import com.modding.forge.capability.EntityStats;
+import com.modding.forge.capability.CapabilityLevel;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -8,33 +8,33 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 
-public class EntityStatsProvider implements ICapabilitySerializable<NBTTagCompound>
+public class CapabilityLevelProvider implements ICapabilitySerializable<NBTTagCompound>
 {
-	@CapabilityInject(EntityStats.class)
-	public static final Capability<EntityStats> ENTITY_STATS_CAP = null;
-	private EntityStats instance = new EntityStats();
+	@CapabilityInject(CapabilityLevel.class)
+	public static final Capability<CapabilityLevel> ENTITY_LEVEL_CAP = null;
+	private CapabilityLevel instance = new CapabilityLevel();
 	
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
 	{
-		return capability == ENTITY_STATS_CAP;
+		return capability == ENTITY_LEVEL_CAP;
 	}
 
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
 	{
-		return capability == ENTITY_STATS_CAP ? ENTITY_STATS_CAP.cast(this.instance) : null;
+		return capability == ENTITY_LEVEL_CAP ? ENTITY_LEVEL_CAP.cast(instance) : null;
 	}
 
 	@Override
 	public NBTTagCompound serializeNBT()
 	{
-		return (NBTTagCompound)ENTITY_STATS_CAP.getStorage().writeNBT(ENTITY_STATS_CAP, instance, null);
+		return (NBTTagCompound)ENTITY_LEVEL_CAP.getStorage().writeNBT(ENTITY_LEVEL_CAP, instance, null);
 	}
 
 	@Override
 	public void deserializeNBT(NBTTagCompound nbt)
 	{
-		ENTITY_STATS_CAP.getStorage().readNBT(ENTITY_STATS_CAP, instance, null, nbt);
+		ENTITY_LEVEL_CAP.getStorage().readNBT(ENTITY_LEVEL_CAP, instance, null, nbt);
 	}
 }

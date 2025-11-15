@@ -1,5 +1,7 @@
 package com.modding.forge.items;
 
+import com.modding.forge.items.interfaces.IAccessory;
+
 import net.minecraft.item.Item;
 
 public class ItemAccessory extends Item implements IAccessory

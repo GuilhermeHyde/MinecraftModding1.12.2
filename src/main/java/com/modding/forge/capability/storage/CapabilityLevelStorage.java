@@ -1,6 +1,6 @@
 package com.modding.forge.capability.storage;
 
-import com.modding.forge.capability.EntityLevel;
+import com.modding.forge.capability.CapabilityLevel;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -8,10 +8,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 
-public class EntityLevelStorage implements IStorage<EntityLevel>
+public class CapabilityLevelStorage implements IStorage<CapabilityLevel>
 {
 	@Override
-	public NBTBase writeNBT(Capability<EntityLevel> capability, EntityLevel instance, EnumFacing side)
+	public NBTBase writeNBT(Capability<CapabilityLevel> capability, CapabilityLevel instance, EnumFacing side)
 	{
 		NBTTagCompound tag = new NBTTagCompound();
 		tag.setFloat("Level", instance.getValue(0));
@@ -25,7 +25,7 @@ public class EntityLevelStorage implements IStorage<EntityLevel>
 	}
 
 	@Override
-	public void readNBT(Capability<EntityLevel> capability, EntityLevel instance, EnumFacing side, NBTBase nbt)
+	public void readNBT(Capability<CapabilityLevel> capability, CapabilityLevel instance, EnumFacing side, NBTBase nbt)
 	{
 		NBTTagCompound tag = (NBTTagCompound) nbt;
 		instance.setValue(0, tag.getFloat("Level"));

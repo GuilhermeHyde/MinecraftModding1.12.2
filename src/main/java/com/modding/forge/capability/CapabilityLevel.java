@@ -1,8 +1,8 @@
 package com.modding.forge.capability;
 
-import com.modding.forge.capability.interfaces.ICapabilityEntityStats;
+import com.modding.forge.capability.interfaces.ICapabilityMod;
 
-public class EntityLevel implements ICapabilityEntityStats
+public class CapabilityLevel implements ICapabilityMod
 {
 	private float level, points, exp, maxExp, strength, resistance, agility;
 	
