@@ -6,13 +6,14 @@ import com.modding.forge.capability.provider.CapabilityAccessoryProvider;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class CapabilityAccessoryPacket implements IMessage
+public class CapabilityAccessoryPacket extends PacketHandler<CapabilityAccessoryPacket>
 {
 	private NBTTagCompound data;
 	private int id;
@@ -37,25 +38,24 @@ public class CapabilityAccessoryPacket implements IMessage
 		buf.writeByte(id);
 		ByteBufUtils.writeTag(buf, data);
 	}
-	
-	public static class CapabilityAccessoryHandler implements IMessageHandler<CapabilityAccessoryPacket, IMessage>
+
+	@Override
+	public void handlerClient(CapabilityAccessoryPacket message, EntityPlayer player)
 	{
-		@Override
-		public IMessage onMessage(CapabilityAccessoryPacket message, MessageContext ctx)
+		if(player != null && player.world != null)
 		{
-			if(ctx.side.isClient())
+			EntityPlayer entity = (EntityPlayer)player.world.getEntityByID(message.id);
+			if(entity != null)
 			{
-				Minecraft.getMinecraft().addScheduledTask(() -> 
-				{
-					EntityPlayerSP player = Minecraft.getMinecraft().player;
-					if(player != null)
-					{
-						CapabilityAccessory capability = player.getCapability(CapabilityAccessoryProvider.INVENTORY_ACCESSORY_CAP, null);
-						if(capability != null) capability.deserializeNBT(message.data);
-					}
-				});
+				CapabilityAccessory capability = entity.getCapability(CapabilityAccessoryProvider.INVENTORY_ACCESSORY_CAP, null);
+				if(capability != null) capability.deserializeNBT(message.data);
 			}
-			return null;
 		}
+	}
+	
+	@Override
+	public void handlerServer(CapabilityAccessoryPacket message, EntityPlayer player)
+	{
+		
 	}
 }

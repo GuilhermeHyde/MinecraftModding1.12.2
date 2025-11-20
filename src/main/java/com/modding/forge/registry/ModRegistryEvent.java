@@ -5,9 +5,11 @@ import com.modding.forge.init.InitBlocks;
 import com.modding.forge.init.InitItems;
 import com.modding.forge.network.ModNetworkingManager;
 import com.modding.forge.capability.CapabilityAccessory;
+import com.modding.forge.capability.CapabilityLevel;
 import com.modding.forge.capability.CapabilityStats;
 import com.modding.forge.capability.storage.CapabilityStatsStorage;
 import com.modding.forge.capability.storage.CapabilityAccessoryStorage;
+import com.modding.forge.capability.storage.CapabilityLevelStorage;
 import com.modding.forge.gui.GuiHandler;
 
 import net.minecraft.block.Block;
@@ -44,9 +46,9 @@ public class ModRegistryEvent
 	@SubscribeEvent
 	public static void onTextureStitch(TextureStitchEvent.Pre event)
 	{
-	    event.getMap().registerSprite(new ResourceLocation("elders_reborn:items/empty_ring"));
-	    event.getMap().registerSprite(new ResourceLocation("elders_reborn:items/empty_necklace"));
-	    event.getMap().registerSprite(new ResourceLocation("elders_reborn:items/empty_hand"));
+	    event.getMap().registerSprite(new ResourceLocation("elders_reborn:gui/empty_ring"));
+	    event.getMap().registerSprite(new ResourceLocation("elders_reborn:gui/empty_necklace"));
+	    event.getMap().registerSprite(new ResourceLocation("elders_reborn:gui/empty_hand"));
 	}
 	
 	public static void preInit(FMLPreInitializationEvent event)
@@ -58,6 +60,7 @@ public class ModRegistryEvent
 	{
 		ModNetworkingManager.initialization();
 		CapabilityManager.INSTANCE.register(CapabilityStats.class, new CapabilityStatsStorage(), CapabilityStats :: new);
+		CapabilityManager.INSTANCE.register(CapabilityLevel.class, new CapabilityLevelStorage(), CapabilityLevel :: new);
 		CapabilityManager.INSTANCE.register(CapabilityAccessory.class, new CapabilityAccessoryStorage(), CapabilityAccessory :: new);
 		NetworkRegistry.INSTANCE.registerGuiHandler(Main.instance, new GuiHandler());
 	}

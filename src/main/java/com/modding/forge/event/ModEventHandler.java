@@ -2,23 +2,17 @@ package com.modding.forge.event;
 
 import java.util.UUID;
 
-import org.lwjgl.input.Keyboard;
-
-import com.modding.forge.Main;
 import com.modding.forge.Reference;
-import com.modding.forge.capability.CapabilityAccessory;
 import com.modding.forge.capability.CapabilityStats;
 import com.modding.forge.capability.provider.CapabilityAccessoryProvider;
 import com.modding.forge.capability.provider.CapabilityStatsProvider;
-import com.modding.forge.containers.ContainerAccessory;
-import com.modding.forge.gui.GuiAccessory;
 import com.modding.forge.network.ModNetworkingManager;
 import com.modding.forge.network.packets.OpenContainerPacket;
-import com.modding.forge.proxy.ModKeybinds;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -27,13 +21,12 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.CombatRules;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class ModEventHandler
@@ -117,7 +110,6 @@ public class ModEventHandler
 	@SubscribeEvent
 	public void onPlayerUpdate(TickEvent.PlayerTickEvent event)
 	{
-		EntityPlayer player = event.player;
 		CapabilityStats stats = event.player.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
 		
 		double attackSpeed = stats.getValue(3) / 100F;
@@ -143,18 +135,25 @@ public class ModEventHandler
 			}
 		}
 	}
-	
+    
 	@SubscribeEvent
-	public void onKeyInputEvent(InputEvent.KeyInputEvent event)
+	public void onScreenOpened(GuiScreenEvent.InitGuiEvent.Post event)
 	{
-		if (Minecraft.getMinecraft().player != null)
+		if (event.getGui() instanceof GuiContainer)
 		{
-			if (ModKeybinds.keyBindingAccessories.isPressed())
-			{
-				if (Minecraft.getMinecraft().currentScreen == null)
+			EntityPlayer player = Minecraft.getMinecraft().player;
+			Class<?> clazz = event.getGui().getClass();
+            
+			if(player.capabilities.isCreativeMode)
+            {
+				if(clazz == GuiContainerCreative.class)
 				{
-					ModNetworkingManager.INSTANCE.sendToServer(new OpenContainerPacket(Reference.INVENTORY_ACCESSORY));
+					ModNetworkingManager.INSTANCE.sendToServer(new OpenContainerPacket(-1));
 				}
+            }
+            else if(clazz == GuiInventory.class)
+			{
+            	ModNetworkingManager.INSTANCE.sendToServer(new OpenContainerPacket(Reference.INVENTORY_ACCESSORY));
 			}
 		}
 	}

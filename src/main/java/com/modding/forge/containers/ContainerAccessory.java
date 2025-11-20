@@ -4,12 +4,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.modding.forge.capability.provider.CapabilityAccessoryProvider;
+import com.modding.forge.init.InitItems;
+import com.modding.forge.items.ItemAccessory;
+import com.modding.forge.items.interfaces.IAccessory.EnumAccessoryType;
 import com.modding.forge.network.ModNetworkingManager;
 import com.modding.forge.network.packets.CapabilityAccessoryPacket;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ContainerPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -23,17 +25,29 @@ public class ContainerAccessory extends ContainerPlayer
 		super(player.inventory, !player.world.isRemote, player);
 		
 		IItemHandler handler = player.getCapability(CapabilityAccessoryProvider.INVENTORY_ACCESSORY_CAP, null);
-    	for(int i = 0; i < 3; i++)
+		for(int i = 0; i < 3; i++)
     	{
     		if(i == 0)
     		{
-    			this.addSlotToContainer(new SlotItemHandler(handler, i, 77, 8 + 18 * i)
+    			this.addSlotToContainer(new SlotItemHandler(handler, i, 77, 8 + i * 18)
     			{
+    				@Override
+                    public boolean isItemValid(ItemStack stack)
+                    {
+                        boolean isAccessory = InitItems.REGISTER_ACCESSORY.contains(stack.getItem());
+                        if(isAccessory)
+                        {
+                        	ItemAccessory accessory = (ItemAccessory)stack.getItem();
+                        	if(accessory.getAccessoryType() == EnumAccessoryType.NECKLACE) return true;
+                        }
+                        return false;
+                    }
+    				
     	            @Nullable
     	            @SideOnly(Side.CLIENT)
     	            public String getSlotTexture()
     	            {
-    	                return "elders_reborn:items/empty_necklace";
+    	                return "elders_reborn:gui/empty_necklace";
     	            }
     	            
     	            @Override
@@ -45,28 +59,34 @@ public class ContainerAccessory extends ContainerPlayer
     		}
     		else
     		{
-    			this.addSlotToContainer(new SlotItemHandler(handler, i, 77, 8 + 18 * i)
+    			this.addSlotToContainer(new SlotItemHandler(handler, i, 77, 8 + i * 18)
     			{
+    				@Override
+                    public boolean isItemValid(ItemStack stack)
+                    {
+                        boolean isAccessory = InitItems.REGISTER_ACCESSORY.contains(stack.getItem());
+                        if(isAccessory)
+                        {
+                        	ItemAccessory accessory = (ItemAccessory)stack.getItem();
+                        	if(accessory.getAccessoryType() == EnumAccessoryType.RING) return true;
+                        }
+                        return false;
+                    }
+    				
     	            @Nullable
     	            @SideOnly(Side.CLIENT)
     	            public String getSlotTexture()
     	            {
-    	                return "elders_reborn:items/empty_ring";
+    	                return "elders_reborn:gui/empty_ring";
+    	            }
+    	            
+    	            @Override
+    	            public void onSlotChange(@Nonnull ItemStack p_75220_1_, @Nonnull ItemStack p_75220_2_)
+    	            {
+    	            	ModNetworkingManager.INSTANCE.sendToAll(new CapabilityAccessoryPacket(player.getEntityId(), player.serializeNBT()));
     	            }
     			});
     		}
     	}
 	}
-    
-    @Override
-    public boolean canInteractWith(EntityPlayer playerIn)
-    {
-        return true;
-    }
-	
-	@Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int index)
-    {
-    	return super.transferStackInSlot(player, index);
-    }
 }
