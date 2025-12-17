@@ -58,11 +58,7 @@ public class FusionFurnaceBlock extends BlockContainer
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hiX, float hitY, float hitZ)
 	{
-		if(!world.isRemote)
-		{
-			player.openGui(Main.instance, Reference.FUSION_FURNACE_GUI, world, pos.getX(), pos.getY(), pos.getZ());
-		}
-		
+		if(!world.isRemote) player.openGui(Main.instance, Reference.FUSION_FURNACE_GUI, world, pos.getX(), pos.getY(), pos.getZ());
 		return true;
 	}
 	

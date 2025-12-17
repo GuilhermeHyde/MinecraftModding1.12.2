@@ -1,5 +1,7 @@
 package com.modding.forge.items.interfaces;
 
+import com.modding.forge.items.ItemAccessory;
+
 public interface IAccessory
 {
 	EnumAccessoryType getAccessoryType();

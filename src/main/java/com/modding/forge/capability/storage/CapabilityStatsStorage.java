@@ -14,12 +14,12 @@ public class CapabilityStatsStorage implements IStorage<CapabilityStats>
 	public NBTBase writeNBT(Capability<CapabilityStats> capability, CapabilityStats instance, EnumFacing side)
 	{
 		NBTTagCompound tag = new NBTTagCompound();
-		tag.setFloat("AttackDamage", instance.getValue(0));
-		tag.setFloat("CriticalDamage", instance.getValue(1));
-		tag.setFloat("MoveSpeed", instance.getValue(2));
-		tag.setFloat("AttackSpeed", instance.getValue(3));
-		tag.setFloat("ArmorDefense", instance.getValue(4));
-		tag.setFloat("ArmorTougthness", instance.getValue(5));
+		tag.setFloat("AttackDamage", instance.getValue("AttackDamage"));
+		tag.setFloat("CriticalDamage", instance.getValue("CriticalDamage"));
+		tag.setFloat("MoveSpeed", instance.getValue("MoveSpeed"));
+		tag.setFloat("AttackSpeed", instance.getValue("AttackSpeed"));
+		tag.setFloat("ArmorDefense", instance.getValue("ArmorDefense"));
+		tag.setFloat("ArmorTougthness", instance.getValue("ArmorToughness"));
 		return tag;
 	}
 
@@ -27,11 +27,11 @@ public class CapabilityStatsStorage implements IStorage<CapabilityStats>
 	public void readNBT(Capability<CapabilityStats> capability, CapabilityStats instance, EnumFacing side, NBTBase nbt)
 	{
 		NBTTagCompound tag = (NBTTagCompound) nbt;
-		instance.setValue(0, tag.getFloat("AttackDamage"));
-		instance.setValue(1, tag.getFloat("CriticalDamage"));
-		instance.setValue(2, tag.getFloat("MoveSpeed"));
-		instance.setValue(3, tag.getFloat("AttackSpeed"));
-		instance.setValue(4, tag.getFloat("ArmorDefense"));
-		instance.setValue(5, tag.getFloat("ArmorTougthness"));
+		instance.setValue("AttackDamage", tag.getFloat("AttackDamage"));
+		instance.setValue("CriticalDamage", tag.getFloat("CriticalDamage"));
+		instance.setValue("MoveSpeed", tag.getFloat("MoveSpeed"));
+		instance.setValue("AttackSpeed", tag.getFloat("AttackSpeed"));
+		instance.setValue("ArmorDefense", tag.getFloat("ArmorDefense"));
+		instance.setValue("ArmorTougthness", tag.getFloat("ArmorTougthness"));
 	}
 }

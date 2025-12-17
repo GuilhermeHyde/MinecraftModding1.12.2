@@ -2,6 +2,6 @@ package com.modding.forge.capability.interfaces;
 
 public interface ICapabilityMod
 {
-	void setValue(int id, float value);
-	float getValue(int id);
+	void setValue(String id, float value);
+	float getValue(String id);
 }

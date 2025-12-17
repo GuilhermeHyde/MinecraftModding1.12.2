@@ -48,7 +48,6 @@ public class ModRegistryEvent
 	{
 	    event.getMap().registerSprite(new ResourceLocation("elders_reborn:gui/empty_ring"));
 	    event.getMap().registerSprite(new ResourceLocation("elders_reborn:gui/empty_necklace"));
-	    event.getMap().registerSprite(new ResourceLocation("elders_reborn:gui/empty_hand"));
 	}
 	
 	public static void preInit(FMLPreInitializationEvent event)

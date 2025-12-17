@@ -3,9 +3,12 @@ package com.modding.forge.event;
 import java.util.UUID;
 
 import com.modding.forge.Reference;
+import com.modding.forge.capability.CapabilityAccessory;
 import com.modding.forge.capability.CapabilityStats;
 import com.modding.forge.capability.provider.CapabilityAccessoryProvider;
+import com.modding.forge.capability.provider.CapabilityLevelProvider;
 import com.modding.forge.capability.provider.CapabilityStatsProvider;
+import com.modding.forge.items.ItemAccessory;
 import com.modding.forge.network.ModNetworkingManager;
 import com.modding.forge.network.packets.OpenContainerPacket;
 
@@ -19,6 +22,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.CombatRules;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent;
@@ -40,6 +44,7 @@ public class ModEventHandler
 		if(event.getObject() instanceof EntityLivingBase)
 		{
 			event.addCapability(new ResourceLocation(Reference.modID(), "entity_stats"), new CapabilityStatsProvider());
+			event.addCapability(new ResourceLocation(Reference.modID(), "entity_level"), new CapabilityLevelProvider());
 		}
 		
 		if(event.getObject() instanceof EntityPlayer)
@@ -51,39 +56,47 @@ public class ModEventHandler
 	@SubscribeEvent
 	public void onLivingHurt(LivingHurtEvent event)
 	{
-		Entity entity = event.getSource().getTrueSource();
-		if(entity instanceof EntityLivingBase)
+		if(event.getSource().getTrueSource() instanceof EntityLivingBase)
 		{
-			EntityLivingBase entityLiving = (EntityLivingBase)event.getSource().getTrueSource();
-			CapabilityStats stats = entityLiving.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
+			EntityLivingBase entity = (EntityLivingBase)event.getSource().getTrueSource();
+			CapabilityStats stats = entity.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
 			
 			if(stats != null)
 			{
-				float statsDamage = 1 + stats.getValue(0) / 100F;
-				float damage = event.getAmount() * statsDamage;
-				
-				float statsDefense = 1 + stats.getValue(4) / 100F;
-				float armorDefense = entityLiving.getTotalArmorValue() * statsDefense;
-				
-				float statsTorghness = 1 + stats.getValue(5) / 100F;
-				float armorTorghness = (float)entityLiving.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS).getAttributeValue() * statsTorghness;
-				
-				float value = CombatRules.getDamageAfterAbsorb(damage, armorDefense, armorTorghness);
-				event.setAmount(value);
+				float statsDamage = stats.getValue("AttackDamage");
+				float damage = event.getAmount() + statsDamage;
+				event.setAmount(damage);
 			}
+		}
+		
+		if(event.getEntityLiving() instanceof EntityLivingBase)
+		{
+			EntityLivingBase entity = (EntityLivingBase)event.getEntityLiving();
+			CapabilityStats stats = entity.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
+			
+			if(stats != null)
+			{
+				float statsDefense = stats.getValue("ArmorDefense");
+				float armorDefense = entity.getTotalArmorValue() + statsDefense;
+				
+				float statsToughness = stats.getValue("ArmorToughness");
+				float armorToughness = (float)entity.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS).getAttributeValue() + statsToughness;
+				
+				float value = CombatRules.getDamageAfterAbsorb(event.getAmount(), armorDefense, armorToughness);
+				event.setAmount(value);
+			}	
 		}
 	}
 	
 	@SubscribeEvent
 	public void onCriticalHit(CriticalHitEvent event)
 	{
-		EntityPlayer player = event.getEntityPlayer();
-		CapabilityStats stats = player.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
+		CapabilityStats stats = event.getEntityPlayer().getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
 		
 		if(stats != null)
 		{
-			float statsCritical = 1 + stats.getValue(1) / 100F;
-			if(event.isVanillaCritical()) event.setDamageModifier(1.5F * statsCritical);
+			float statsCritical = stats.getValue("CriticalDamage");
+			if(event.isVanillaCritical()) event.setDamageModifier(1.5F + statsCritical);
 		}
 	}
 	
@@ -95,7 +108,7 @@ public class ModEventHandler
 		
 		if(stats != null)
 		{
-			double moveSpeed = stats.getValue(2) / 100F;
+			double moveSpeed = stats.getValue("MoveSpeed") / 100F;
 			IAttributeInstance speedAttribute = entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
 			AttributeModifier speedModifier = speedAttribute.getModifier(MOVESPEED_MODIFIER_UUID);
 			
@@ -111,21 +124,31 @@ public class ModEventHandler
 	public void onPlayerUpdate(TickEvent.PlayerTickEvent event)
 	{
 		CapabilityStats stats = event.player.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
+		CapabilityAccessory accessorySlots = event.player.getCapability(CapabilityAccessoryProvider.INVENTORY_ACCESSORY_CAP, null);
 		
-		double attackSpeed = stats.getValue(3) / 100F;
+		double attackSpeed = stats.getValue("AttackSpeed") / 100F;
 		IAttributeInstance attackAttribute = event.player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED);
 		AttributeModifier attackModifier = attackAttribute.getModifier(ATTACKSPEED_MODIFIER_UUID);
 		
-		double moveSpeed = stats.getValue(2) / 100F;
-		IAttributeInstance speedAttribute = event.player.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
-		AttributeModifier speedModifier = speedAttribute.getModifier(MOVESPEED_MODIFIER_UUID);
-		
 		if(stats != null)
 		{
-			if(speedModifier == null || speedModifier.getAmount() != moveSpeed)
+			if(accessorySlots != null)
 			{
-				if(speedModifier != null)speedAttribute.removeModifier(MOVESPEED_MODIFIER_UUID);
-				speedAttribute.applyModifier(new AttributeModifier(MOVESPEED_MODIFIER_UUID, "CustomPlayerSpeed", moveSpeed, 2));
+				for(int i = 0; i < accessorySlots.getSlots(); i++)
+				{
+					String slotKey = "BufferSlot" + i;
+					ItemStack stack = accessorySlots.getStackInSlot(i);
+					boolean isCount = stats.isContain(slotKey);
+					boolean isChange = accessorySlots.compareItemStack(stack, i);
+					
+					if(!stack.isEmpty() && stack.getItem() instanceof ItemAccessory)
+					{
+						ItemAccessory buffer = (ItemAccessory)stack.getItem();
+						if(isChange && isCount) stats.removeBuffer(slotKey);
+						else if(!isCount) stats.applyBuffer(slotKey, buffer.getAttributes());
+					}
+					else if(isCount) stats.removeBuffer(slotKey);
+				}
 			}
 			
 			if(attackModifier == null || attackModifier.getAmount() != attackSpeed)
@@ -145,16 +168,10 @@ public class ModEventHandler
 			Class<?> clazz = event.getGui().getClass();
             
 			if(player.capabilities.isCreativeMode)
-            {
-				if(clazz == GuiContainerCreative.class)
-				{
-					ModNetworkingManager.INSTANCE.sendToServer(new OpenContainerPacket(-1));
-				}
-            }
-            else if(clazz == GuiInventory.class)
 			{
-            	ModNetworkingManager.INSTANCE.sendToServer(new OpenContainerPacket(Reference.INVENTORY_ACCESSORY));
+				if(clazz == GuiContainerCreative.class) ModNetworkingManager.INSTANCE.sendToServer(new OpenContainerPacket(-1));
 			}
+            else if(clazz == GuiInventory.class) ModNetworkingManager.INSTANCE.sendToServer(new OpenContainerPacket(Reference.INVENTORY_ACCESSORY));
 		}
 	}
 }

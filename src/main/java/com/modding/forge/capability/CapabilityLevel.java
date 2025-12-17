@@ -7,29 +7,29 @@ public class CapabilityLevel implements ICapabilityMod
 	private float level, points, exp, maxExp, strength, resistance, agility;
 	
 	@Override
-	public void setValue(int id, float value)
+	public void setValue(String name, float value)
 	{
-		switch(id)
+		switch(name)
 		{
-		case 0:
+		case "Level":
 			this.level = value;
 			break;
-		case 1:
+		case "Points":
 			this.points = value;
 			break;
-		case 2:
+		case "Exp":
 			this.exp = value;
 			break;
-		case 3:
+		case "MaxExp":
 			this.maxExp = value;
 			break;
-		case 4:
+		case "Strength":
 			this.strength = value;
 			break;
-		case 5:
+		case "Resistance":
 			this.resistance = value;
 			break;
-		case 6:
+		case "Agility":
 			this.agility = value;
 			break;
 			default:
@@ -38,23 +38,23 @@ public class CapabilityLevel implements ICapabilityMod
 	}
 
 	@Override
-	public float getValue(int id)
+	public float getValue(String name)
 	{
-		switch(id)
+		switch(name)
 		{
-		case 0:
+		case "Level":
 			return this.level;
-		case 1:
+		case "Points":
 			return this.points;
-		case 2:
+		case "Exp":
 			return this.exp;
-		case 3:
+		case "MaxExp":
 			return this.maxExp;
-		case 4:
+		case "Strength":
 			return this.strength;
-		case 5:
+		case "Resistance":
 			return this.resistance;
-		case 6:
+		case "Agility":
 			return this.agility;
 			default:
 				return 0;

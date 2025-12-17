@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.modding.forge.Reference;
 import com.modding.forge.items.ItemAccessory;
+import com.modding.forge.items.ItemAccessory.AccessoryAttribute;
 import com.modding.forge.items.interfaces.IAccessory.EnumAccessoryType;
 
 import net.minecraft.creativetab.CreativeTabs;
@@ -23,12 +24,12 @@ public class InitItems
 	public static final Item MITHRIL_INGOT = createItem("mithril_ingot");
 	public static final Item ORICHALCUM_INGOT = createItem("orichalcum_ingot");
 	
-	public static final ItemAccessory IRON_RING = createAccessory("iron_ring", EnumAccessoryType.RING);
-	public static final ItemAccessory IRON_NECKLACE = createAccessory("iron_necklace", EnumAccessoryType.NECKLACE);
-	public static final ItemAccessory DIAMOND_RING = createAccessory("diamond_ring", EnumAccessoryType.RING);
-	public static final ItemAccessory DIAMOND_NECKLACE = createAccessory("diamond_necklace", EnumAccessoryType.NECKLACE);
-	public static final ItemAccessory EMERALD_RING = createAccessory("emerald_ring", EnumAccessoryType.RING);
-	public static final ItemAccessory EMERALD_NECKLACE = createAccessory("emerald_necklace", EnumAccessoryType.NECKLACE);
+	public static final ItemAccessory IRON_RING = createAccessory("iron_ring", EnumAccessoryType.RING, AccessoryAttribute.IRON_RING);
+	public static final ItemAccessory IRON_NECKLACE = createAccessory("iron_necklace", EnumAccessoryType.NECKLACE, AccessoryAttribute.IRON_NECKLACE);
+	public static final ItemAccessory DIAMOND_RING = createAccessory("diamond_ring", EnumAccessoryType.RING, AccessoryAttribute.DIAMOND_RING);
+	public static final ItemAccessory DIAMOND_NECKLACE = createAccessory("diamond_necklace", EnumAccessoryType.NECKLACE, AccessoryAttribute.DIAMOND_NECKLACE);
+	public static final ItemAccessory EMERALD_RING = createAccessory("emerald_ring", EnumAccessoryType.RING, AccessoryAttribute.GOLD_RING);
+	public static final ItemAccessory EMERALD_NECKLACE = createAccessory("emerald_necklace", EnumAccessoryType.NECKLACE, AccessoryAttribute.GOLD_NECKLACE);
 	
 	private static Item createItem(String name)
 	{
@@ -42,9 +43,9 @@ public class InitItems
 		return item;
 	}
 	
-	private static ItemAccessory createAccessory(String name, EnumAccessoryType type)
+	private static ItemAccessory createAccessory(String name, EnumAccessoryType type, AccessoryAttribute acessory)
 	{
-		ItemAccessory item = new ItemAccessory(type);
+		ItemAccessory item = new ItemAccessory(type, acessory);
 		item.setUnlocalizedName(name);
 		item.setRegistryName(Reference.location(name));
 		item.setCreativeTab(CreativeTabs.COMBAT);
