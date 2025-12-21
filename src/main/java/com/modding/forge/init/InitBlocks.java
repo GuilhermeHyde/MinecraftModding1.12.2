@@ -14,8 +14,8 @@ import net.minecraft.item.ItemBlock;
 
 public class InitBlocks
 {
-	public static final List<Block> REGISTER_BLOCK = new ArrayList<Block>();
-	public static final List<Item> REGISTER_ITEMBLOCK = new ArrayList<Item>();
+	private static final List<Block> REGISTER_BLOCK = new ArrayList<Block>();
+	private static final List<Item> REGISTER_ITEMBLOCK = new ArrayList<Item>();
 	
 	public static final Block BRONZE_BLOCK = createBlock("bronze_block", Material.IRON);
 	public static final Block STEEL_BLOCK = createBlock("steel_block", Material.IRON);
@@ -54,5 +54,15 @@ public class InitBlocks
 		REGISTER_BLOCK.add(block);
 		REGISTER_ITEMBLOCK.add(itemBlock);
 		return block;
+	}
+	
+	public static Block[] getBlockList()
+	{
+		return REGISTER_BLOCK.toArray(new Block[0]);
+	}
+	
+	public static Item[] getItemBlockList()
+	{
+		return REGISTER_ITEMBLOCK.toArray(new Item[0]);
 	}
 }

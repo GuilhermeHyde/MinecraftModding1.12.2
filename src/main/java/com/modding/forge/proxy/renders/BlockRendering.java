@@ -1,7 +1,5 @@
 package com.modding.forge.proxy.renders;
 
-import java.util.List;
-
 import com.modding.forge.init.InitBlocks;
 
 import net.minecraft.block.Block;
@@ -16,15 +14,12 @@ public class BlockRendering
 	@SubscribeEvent
 	public void onModelRegisterEvent(ModelRegistryEvent event)
 	{
-		List<Block> blockList = InitBlocks.REGISTER_BLOCK;
-		for(int i = 0; i < blockList.size(); i++)
-		{
-			if(!blockList.isEmpty()) register(blockList.get(i));
-		}
+		register(InitBlocks.getBlockList());
 	}
 	
-	private static void register(Block block)
+	private static void register(Block[] block)
 	{
-		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
+		for(int i = 0; i < block.length; i++)
+		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block[i]), 0, new ModelResourceLocation(block[i].getRegistryName(), "inventory"));
 	}
 }

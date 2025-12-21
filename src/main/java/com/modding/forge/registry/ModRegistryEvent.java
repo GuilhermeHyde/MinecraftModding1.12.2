@@ -31,16 +31,16 @@ public class ModRegistryEvent
 	@SubscribeEvent
 	public static void onRegisterBlockEvent(RegistryEvent.Register<Block> event)
 	{
-		event.getRegistry().registerAll(InitBlocks.REGISTER_BLOCK.toArray(new Block[0]));
+		event.getRegistry().registerAll(InitBlocks.getBlockList());
 		TileEntityRegistry.register();
 	}
 	
 	@SubscribeEvent
 	public static void onRegisterItemEvent(RegistryEvent.Register<Item> event)
 	{
-		event.getRegistry().registerAll(InitItems.REGISTER_ITEMS.toArray(new Item[0]));
-		event.getRegistry().registerAll(InitItems.REGISTER_ACCESSORY.toArray(new Item[0]));
-		event.getRegistry().registerAll(InitBlocks.REGISTER_ITEMBLOCK.toArray(new Item[0]));
+		event.getRegistry().registerAll(InitItems.getItemList());
+		event.getRegistry().registerAll(InitItems.getItemAccessoryList());
+		event.getRegistry().registerAll(InitBlocks.getItemBlockList());
 	}
 	
 	@SubscribeEvent

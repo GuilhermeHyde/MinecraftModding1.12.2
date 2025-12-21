@@ -10,11 +10,12 @@ import com.modding.forge.items.interfaces.IAccessory.EnumAccessoryType;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
 public class InitItems
 {
-	public static final List<Item> REGISTER_ITEMS = new ArrayList<Item>();
-	public static final List<Item> REGISTER_ACCESSORY = new ArrayList<Item>();
+	private static final List<Item> REGISTER_ITEMS = new ArrayList<Item>();
+	private static final List<Item> REGISTER_ACCESSORY = new ArrayList<Item>();
 	
 	public static final Item BRONZE_INGOT = createItem("bronze_ingot");
 	public static final Item STEEL_INGOT = createItem("steel_ingot");
@@ -53,5 +54,20 @@ public class InitItems
 		
 		REGISTER_ACCESSORY.add(item);
 		return item;
+	}
+	
+	public static Item[] getItemList()
+	{
+		return REGISTER_ITEMS.toArray(new Item[0]);
+	}
+	
+	public static Item[] getItemAccessoryList()
+	{
+		return REGISTER_ACCESSORY.toArray(new Item[0]);
+	}
+	
+	public static boolean isAccessory(ItemStack stack)
+	{
+		return REGISTER_ACCESSORY.contains(stack.getItem());
 	}
 }

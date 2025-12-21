@@ -12,6 +12,7 @@ import com.modding.forge.network.packets.CapabilityAccessoryPacket;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ContainerPlayer;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -34,7 +35,7 @@ public class ContainerAccessory extends ContainerPlayer
     				@Override
                     public boolean isItemValid(ItemStack stack)
                     {
-                        boolean isAccessory = InitItems.REGISTER_ACCESSORY.contains(stack.getItem());
+                        boolean isAccessory = InitItems.isAccessory(stack);
                         if(isAccessory)
                         {
                         	ItemAccessory accessory = (ItemAccessory)stack.getItem();
@@ -64,7 +65,7 @@ public class ContainerAccessory extends ContainerPlayer
     				@Override
                     public boolean isItemValid(ItemStack stack)
                     {
-                        boolean isAccessory = InitItems.REGISTER_ACCESSORY.contains(stack.getItem());
+                        boolean isAccessory = InitItems.isAccessory(stack);
                         if(isAccessory)
                         {
                         	ItemAccessory accessory = (ItemAccessory)stack.getItem();
@@ -89,4 +90,26 @@ public class ContainerAccessory extends ContainerPlayer
     		}
     	}
 	}
+	
+	@Override
+    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
+    {
+		Slot slot = (Slot)this.inventorySlots.get(index);
+		if(slot != null && slot.getHasStack())
+		{
+			ItemStack stack = slot.getStack();
+			if(InitItems.isAccessory(stack))
+			{
+				ItemAccessory accessory = (ItemAccessory)stack.getItem();
+				int i = accessory.getAccessoryType().getIndex();
+				boolean isEmpty = !this.inventorySlots.get(45 + i).getHasStack() || !this.inventorySlots.get(46 + i).getHasStack();
+				
+				if(index < 46 && isEmpty)
+				{
+					if(!this.mergeItemStack(stack, 46, 49, false)) return ItemStack.EMPTY;
+				}
+			}
+		}
+		return super.transferStackInSlot(playerIn, index);
+    }
 }
