@@ -4,11 +4,9 @@ import com.modding.forge.Reference;
 import com.modding.forge.blocks.containers.ContainerFusionFurnace;
 import com.modding.forge.blocks.gui.FusionFurnaceGui;
 import com.modding.forge.blocks.tilentities.TileEntityFusionFurnace;
-import com.modding.forge.capability.provider.CapabilityAccessoryProvider;
 import com.modding.forge.containers.ContainerAccessory;
 
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
-import net.minecraft.client.gui.inventory.GuiContainerCreative.ContainerCreative;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;

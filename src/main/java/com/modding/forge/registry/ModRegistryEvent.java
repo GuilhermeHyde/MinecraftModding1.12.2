@@ -5,11 +5,17 @@ import com.modding.forge.init.InitBlocks;
 import com.modding.forge.init.InitItems;
 import com.modding.forge.network.ModNetworkingManager;
 import com.modding.forge.capability.CapabilityAccessory;
+import com.modding.forge.capability.CapabilityAttribute;
+import com.modding.forge.capability.CapabilityEquipment;
 import com.modding.forge.capability.CapabilityLevel;
 import com.modding.forge.capability.CapabilityStats;
+import com.modding.forge.capability.CapabilityWeapon;
 import com.modding.forge.capability.storage.CapabilityStatsStorage;
 import com.modding.forge.capability.storage.CapabilityAccessoryStorage;
 import com.modding.forge.capability.storage.CapabilityLevelStorage;
+import com.modding.forge.capability.storage.CapabilityAttributeStorage;
+import com.modding.forge.capability.storage.CapabilityWeaponStorage;
+import com.modding.forge.capability.storage.CapabilityEquipmentStorage;
 import com.modding.forge.gui.GuiHandler;
 
 import net.minecraft.block.Block;
@@ -61,6 +67,10 @@ public class ModRegistryEvent
 		CapabilityManager.INSTANCE.register(CapabilityStats.class, new CapabilityStatsStorage(), CapabilityStats :: new);
 		CapabilityManager.INSTANCE.register(CapabilityLevel.class, new CapabilityLevelStorage(), CapabilityLevel :: new);
 		CapabilityManager.INSTANCE.register(CapabilityAccessory.class, new CapabilityAccessoryStorage(), CapabilityAccessory :: new);
+		CapabilityManager.INSTANCE.register(CapabilityAttribute.class, new CapabilityAttributeStorage(), CapabilityAttribute :: new);
+		CapabilityManager.INSTANCE.register(CapabilityWeapon.class, new CapabilityWeaponStorage(), CapabilityWeapon :: new);
+		CapabilityManager.INSTANCE.register(CapabilityEquipment.class, new CapabilityEquipmentStorage(), CapabilityEquipment :: new);
+		
 		NetworkRegistry.INSTANCE.registerGuiHandler(Main.instance, new GuiHandler());
 	}
 	

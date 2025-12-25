@@ -1,13 +1,18 @@
 package com.modding.forge.event;
 
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import com.modding.forge.Reference;
 import com.modding.forge.capability.CapabilityAccessory;
+import com.modding.forge.capability.CapabilityEquipment;
 import com.modding.forge.capability.CapabilityStats;
+import com.modding.forge.capability.CapabilityWeapon;
 import com.modding.forge.capability.provider.CapabilityAccessoryProvider;
+import com.modding.forge.capability.provider.CapabilityEquipmentProvider;
 import com.modding.forge.capability.provider.CapabilityLevelProvider;
 import com.modding.forge.capability.provider.CapabilityStatsProvider;
+import com.modding.forge.capability.provider.CapabilityWeaponProvider;
 import com.modding.forge.items.ItemAccessory;
 import com.modding.forge.network.ModNetworkingManager;
 import com.modding.forge.network.packets.OpenContainerPacket;
@@ -22,14 +27,20 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
 import net.minecraft.util.CombatRules;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -39,7 +50,7 @@ public class ModEventHandler
 	private static final UUID ATTACKSPEED_MODIFIER_UUID = UUID.fromString("6E941920-1F2F-4A9B-B1D6-11B5A4B29E30");
 	
 	@SubscribeEvent
-	public void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event)
+	public void onCapabilitiesEntity(AttachCapabilitiesEvent<Entity> event)
 	{
 		if(event.getObject() instanceof EntityLivingBase)
 		{
@@ -51,6 +62,14 @@ public class ModEventHandler
 		{
 			event.addCapability(new ResourceLocation(Reference.modID(), "inventory_accessory"), new CapabilityAccessoryProvider());
 		}
+	}
+	
+	@SubscribeEvent
+	public void onCapabilitiesItemStack(AttachCapabilitiesEvent<ItemStack> event)
+	{
+		boolean isWeapon = event.getObject().getItem() instanceof ItemSword || event.getObject().getItem() instanceof ItemBow;
+		if(isWeapon) event.addCapability(new ResourceLocation(Reference.modID(), "attribute_weapon"), new CapabilityWeaponProvider());
+		if(event.getObject().getItem() instanceof ItemArmor) event.addCapability(new ResourceLocation(Reference.modID(), "attribute_equipment"), new CapabilityEquipmentProvider());
 	}
 	
 	@SubscribeEvent
@@ -172,6 +191,42 @@ public class ModEventHandler
 				if(clazz == GuiContainerCreative.class) ModNetworkingManager.INSTANCE.sendToServer(new OpenContainerPacket(-1));
 			}
             else if(clazz == GuiInventory.class) ModNetworkingManager.INSTANCE.sendToServer(new OpenContainerPacket(Reference.INVENTORY_ACCESSORY));
+		}
+	}
+	
+	@SubscribeEvent
+	public void onItemTooltip(ItemTooltipEvent event)
+	{
+		ItemStack stack = event.getItemStack();
+		Item item = stack.getItem();
+		CapabilityWeapon cap_weapon = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
+		CapabilityEquipment cap_equipment = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+		
+		if(cap_weapon != null)
+		{
+			if(item instanceof ItemSword || item instanceof ItemBow)
+			{
+				if(!cap_weapon.isEmpty())
+				{
+					event.getToolTip().add("");
+					event.getToolTip().add("Quality Weapon:" + cap_weapon.getColorText(cap_weapon.getQuality()) + " " + cap_weapon.getQuality());
+					
+					for(int i = 0; i < cap_weapon.getSize(); i++)
+					{
+						String value = "" + cap_weapon.getAttributeValue(i);
+						if(cap_weapon.getAttributeValue(i) > 0) value = "+" + value;
+						event.getToolTip().add(cap_weapon.getColorValue(cap_weapon.getAttributeValue(i)) + "" + value + " " + cap_weapon.getAttributeName(i));
+					}
+				}
+			}
+		}
+		
+		if(cap_equipment != null)
+		{
+			if(item instanceof ItemArmor)
+			{
+				event.getToolTip().add(TextFormatting.BLUE + " Attribute Armor");
+			}
 		}
 	}
 }
