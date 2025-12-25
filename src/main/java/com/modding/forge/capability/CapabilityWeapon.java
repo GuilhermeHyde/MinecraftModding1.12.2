@@ -15,19 +15,25 @@ public class CapabilityWeapon implements ICapabilityMod
 	private float attackDamage, criticalDamage, attackSpeed;
 	private String[] nameAttribute = {"AttackDamage", "CriticalDamage", "AttackSpeed"};
 	private EnumQuality quality;
-	private EnumQuality[] qualityList = {EnumQuality.COMMON, EnumQuality.RARE, EnumQuality.EPIC, EnumQuality.LEGENDARY};
 	private List<Entry<String, Float>> attribute = new ArrayList<>();
 	
 	public CapabilityWeapon()
 	{
 		if(this.attribute.isEmpty() && this.quality == null)
 		{
-			this.setQuality(this.qualityList[ThreadLocalRandom.current().nextInt(this.qualityList.length)]);
-			int amount = this.getQuality().getAmount();
+			float chance = ThreadLocalRandom.current().nextFloat();
+			for(EnumQuality quality : EnumQuality.values()) if(chance <= quality.getChance()) this.setQuality(quality);
+			if(this.getQuality() == null) this.setQuality(EnumQuality.COMMON);
 			
+			int amount = this.getQuality().getAmount();
 			for(int i = 0; i < amount; i++)
 			{
-				int limit = ThreadLocalRandom.current().nextInt(this.getQuality().getLimit() * -1, this.getQuality().getLimit());
+				int harmful = ThreadLocalRandom.current().nextInt(this.getQuality().getHarmful(), -1);
+				int benefit = ThreadLocalRandom.current().nextInt(1, this.getQuality().getLimit());
+				int limit;
+				do limit = ThreadLocalRandom.current().nextInt(harmful, benefit);
+				while(limit == 0);
+				
 				String attributeName = this.nameAttribute[ThreadLocalRandom.current().nextInt(this.nameAttribute.length)];
 				this.incrementAttritube(attributeName, limit);
 			}

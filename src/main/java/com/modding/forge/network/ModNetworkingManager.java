@@ -2,7 +2,6 @@ package com.modding.forge.network;
 
 import com.modding.forge.Reference;
 import com.modding.forge.network.packets.CapabilityAccessoryPacket;
-import com.modding.forge.network.packets.CapabilityAttributePacket;
 import com.modding.forge.network.packets.CapabilityEquipmetPacket;
 import com.modding.forge.network.packets.CapabilityLevelPacket;
 import com.modding.forge.network.packets.CapabilityStatsPacket;
@@ -23,7 +22,6 @@ public class ModNetworkingManager
 		INSTANCE.registerMessage(CapabilityStatsPacket.class, CapabilityStatsPacket.class, packetID++, Side.CLIENT);
 		INSTANCE.registerMessage(CapabilityLevelPacket.class, CapabilityLevelPacket.class, packetID++, Side.CLIENT);
 		INSTANCE.registerMessage(CapabilityAccessoryPacket.class, CapabilityAccessoryPacket.class, packetID++, Side.CLIENT);
-		INSTANCE.registerMessage(CapabilityAttributePacket.class, CapabilityAttributePacket.class, packetID++, Side.CLIENT);
 		INSTANCE.registerMessage(CapabilityWeaponPacket.class, CapabilityWeaponPacket.class, packetID++, Side.CLIENT);
 		INSTANCE.registerMessage(CapabilityEquipmetPacket.class, CapabilityEquipmetPacket.class, packetID++, Side.CLIENT);
 		

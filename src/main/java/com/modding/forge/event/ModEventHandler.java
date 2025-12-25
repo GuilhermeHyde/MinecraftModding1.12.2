@@ -1,6 +1,5 @@
 package com.modding.forge.event;
 
-import java.util.Map.Entry;
 import java.util.UUID;
 
 import com.modding.forge.Reference;
@@ -209,7 +208,7 @@ public class ModEventHandler
 				if(!cap_weapon.isEmpty())
 				{
 					event.getToolTip().add("");
-					event.getToolTip().add("Quality Weapon:" + cap_weapon.getColorText(cap_weapon.getQuality()) + " " + cap_weapon.getQuality());
+					event.getToolTip().add("Weapon attribute:" + cap_weapon.getColorText(cap_weapon.getQuality()) + " " + cap_weapon.getQuality());
 					
 					for(int i = 0; i < cap_weapon.getSize(); i++)
 					{
