@@ -4,7 +4,6 @@ import com.modding.forge.capability.CapabilityStats;
 import com.modding.forge.capability.provider.CapabilityStatsProvider;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -12,27 +11,27 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 public class CapabilityStatsPacket extends PacketHandler<CapabilityStatsPacket>
 {
 	private NBTTagCompound data;
-	private int entityID;
+	//private int entityID;
 	
 	public CapabilityStatsPacket() {}
-	public CapabilityStatsPacket(int id, NBTTagCompound data)
+	public CapabilityStatsPacket(NBTTagCompound data)
 	{
 		this.data = data;
-		this.entityID = id;
+		//this.entityID = id;
 	}
 	
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
-		this.entityID = buf.readInt();
+		//this.entityID = buf.readInt();
 		this.data = ByteBufUtils.readTag(buf);
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
-		buf.writeInt(entityID);
-		ByteBufUtils.writeTag(buf, data);
+		//buf.writeInt(entityID);
+		ByteBufUtils.writeTag(buf, this.data);
 	}
 
 	@Override
@@ -40,12 +39,8 @@ public class CapabilityStatsPacket extends PacketHandler<CapabilityStatsPacket>
 	{
 		if(player != null && player.world != null)
 		{
-			Entity entity = player.world.getEntityByID(message.entityID);
-			if(entity != null)
-			{
-				CapabilityStats capability = entity.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
-				if(capability != null) entity.deserializeNBT(message.data);
-			}
+			CapabilityStats cap = player.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
+			if(cap != null) cap.deserializeNBT(message.data);
 		}
 	}
 	

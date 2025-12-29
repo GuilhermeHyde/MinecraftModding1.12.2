@@ -50,12 +50,6 @@ public class ContainerAccessory extends ContainerPlayer
     	            {
     	                return "elders_reborn:gui/empty_necklace";
     	            }
-    	            
-    	            @Override
-    	            public void onSlotChange(@Nonnull ItemStack p_75220_1_, @Nonnull ItemStack p_75220_2_)
-    	            {
-    	            	ModNetworkingManager.INSTANCE.sendToAll(new CapabilityAccessoryPacket(player.getEntityId(), player.serializeNBT()));
-    	            }
     			});
     		}
     		else
@@ -79,12 +73,6 @@ public class ContainerAccessory extends ContainerPlayer
     	            public String getSlotTexture()
     	            {
     	                return "elders_reborn:gui/empty_ring";
-    	            }
-    	            
-    	            @Override
-    	            public void onSlotChange(@Nonnull ItemStack p_75220_1_, @Nonnull ItemStack p_75220_2_)
-    	            {
-    	            	ModNetworkingManager.INSTANCE.sendToAll(new CapabilityAccessoryPacket(player.getEntityId(), player.serializeNBT()));
     	            }
     			});
     		}

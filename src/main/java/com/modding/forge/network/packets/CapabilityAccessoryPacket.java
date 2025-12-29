@@ -14,7 +14,7 @@ public class CapabilityAccessoryPacket extends PacketHandler<CapabilityAccessory
 	private int id;
 
 	public CapabilityAccessoryPacket(){}
-	public CapabilityAccessoryPacket(int id, NBTTagCompound data)
+	public CapabilityAccessoryPacket(NBTTagCompound data, int id)
 	{
 		this.data = data;
 		this.id = id;

@@ -43,8 +43,8 @@ public class CapabilityWeaponPacket extends PacketHandler<CapabilityWeaponPacket
 			ItemStack stack = player.inventory.getStackInSlot(message.index);
 			if(!stack.isEmpty())
 			{
-				CapabilityWeapon capability = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
-				if(capability != null) CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP.getStorage().readNBT(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, capability, null, message.data);
+				CapabilityWeapon cap = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
+				if(cap != null) cap.deserializeNBT(message.data);
 			}
 		}
 	}

@@ -29,12 +29,12 @@ public class CapabilityStatsProvider implements ICapabilitySerializable<NBTTagCo
 	@Override
 	public NBTTagCompound serializeNBT()
 	{
-		return (NBTTagCompound)ENTITY_STATS_CAP.getStorage().writeNBT(ENTITY_STATS_CAP, instance, null);
+		return this.instance.serializeNBT();
 	}
 
 	@Override
 	public void deserializeNBT(NBTTagCompound nbt)
 	{
-		ENTITY_STATS_CAP.getStorage().readNBT(ENTITY_STATS_CAP, instance, null, nbt);
+		if(nbt != null) this.instance.deserializeNBT(nbt);
 	}
 }

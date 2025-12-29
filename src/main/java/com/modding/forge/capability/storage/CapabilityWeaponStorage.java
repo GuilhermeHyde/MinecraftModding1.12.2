@@ -13,19 +13,12 @@ public class CapabilityWeaponStorage implements IStorage<CapabilityWeapon>
 	@Override
 	public NBTBase writeNBT(Capability<CapabilityWeapon> capability, CapabilityWeapon instance, EnumFacing side)
 	{
-		NBTTagCompound tag = new NBTTagCompound();
-		tag.setFloat("AttackDamage", instance.getValue("AttackDamage"));
-		tag.setFloat("CriticalDamage", instance.getValue("CriticalDamage"));
-		tag.setFloat("AttackSpeed", instance.getValue("AttackSpeed"));
-		return tag;
+		return instance.serializeNBT();
 	}
 
 	@Override
 	public void readNBT(Capability<CapabilityWeapon> capability, CapabilityWeapon instance, EnumFacing side, NBTBase nbt)
 	{
-		NBTTagCompound tag = (NBTTagCompound)nbt;
-		instance.setValue("AttackDamage", tag.getFloat("AttackDamage"));
-		instance.setValue("CriticalDamage", tag.getFloat("CriticalDamage"));
-		instance.setValue("AttackSpeed", tag.getFloat("AttackSpeed"));
+		if(nbt instanceof NBTTagCompound) instance.deserializeNBT((NBTTagCompound)nbt);
 	}
 }

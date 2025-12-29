@@ -5,8 +5,8 @@ public enum EnumQuality
 	NULL(0, 0, 0, 0.0F),
 	COMMON(4, -12, 1, 0.77F),
 	RARE(8, -6, 2, 0.55F),
-	EPIC(12, -4, 3, 0.15F),
-	LEGENDARY(16, -2, 4, 0.04F);
+	EPIC(12, -4, 3, 0.08F),
+	LEGENDARY(16, -2, 4, 0.02F);
 	
 	private int limit, harmful, amount;
 	private float chance;

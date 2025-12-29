@@ -2,7 +2,9 @@ package com.modding.forge.capability;
 
 import com.modding.forge.capability.interfaces.ICapabilityMod;
 
-public class CapabilityLevel implements ICapabilityMod
+import net.minecraft.nbt.NBTTagCompound;
+
+public class CapabilityLevel implements ICapabilityMod<NBTTagCompound>
 {
 	private float level, points, exp, maxExp, strength, resistance, agility;
 	
@@ -59,5 +61,31 @@ public class CapabilityLevel implements ICapabilityMod
 			default:
 				return 0;
 		}
+	}
+
+	@Override
+	public NBTTagCompound serializeNBT()
+	{
+		NBTTagCompound tag = new NBTTagCompound();
+		tag.setFloat("Level", this.getValue("Level"));
+		tag.setFloat("Points", this.getValue("Points"));
+		tag.setFloat("Exp", this.getValue("Exp"));
+		tag.setFloat("MaxExp", this.getValue("MaxExp"));
+		tag.setFloat("Strength", this.getValue("Strength"));
+		tag.setFloat("Resistance", this.getValue("Resistance"));
+		tag.setFloat("Agility", this.getValue("Agility"));
+		return tag;
+	}
+
+	@Override
+	public void deserializeNBT(NBTTagCompound nbt)
+	{
+		this.setValue("Level", nbt.getFloat("Level"));
+		this.setValue("Points", nbt.getFloat("Points"));
+		this.setValue("Exp", nbt.getFloat("Exp"));
+		this.setValue("MaxExp", nbt.getFloat("MaxExp"));
+		this.setValue("Strength", nbt.getFloat("Strength"));
+		this.setValue("Resistance", nbt.getFloat("Resistance"));
+		this.setValue("Agility", nbt.getFloat("Agility"));
 	}
 }

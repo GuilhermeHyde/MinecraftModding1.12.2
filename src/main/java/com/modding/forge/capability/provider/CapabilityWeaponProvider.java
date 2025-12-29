@@ -29,12 +29,12 @@ public class CapabilityWeaponProvider implements ICapabilitySerializable<NBTTagC
 	@Override
 	public NBTTagCompound serializeNBT()
 	{
-		return (NBTTagCompound)WEAPON_ATTRIBUTE_CAP.getStorage().writeNBT(WEAPON_ATTRIBUTE_CAP, instance, null);
+		return this.instance.serializeNBT();
 	}
 
 	@Override
 	public void deserializeNBT(NBTTagCompound nbt)
 	{
-		WEAPON_ATTRIBUTE_CAP.getStorage().readNBT(WEAPON_ATTRIBUTE_CAP, instance, null, nbt);
+		if(nbt != null) this.instance.deserializeNBT(nbt);
 	}
 }

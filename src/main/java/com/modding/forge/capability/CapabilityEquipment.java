@@ -6,7 +6,9 @@ import java.util.Map.Entry;
 
 import com.modding.forge.capability.interfaces.ICapabilityMod;
 
-public class CapabilityEquipment implements ICapabilityMod
+import net.minecraft.nbt.NBTTagCompound;
+
+public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 {
 	private float armorDefense, armorToughness, moveSpeed;
 	private EnumQuality quality;
@@ -108,5 +110,23 @@ public class CapabilityEquipment implements ICapabilityMod
 			default:
 				return 0;
 		}
+	}
+
+	@Override
+	public NBTTagCompound serializeNBT()
+	{
+		NBTTagCompound tag = new NBTTagCompound();
+		tag.setFloat("ArmorDefense", this.getValue("ArmorDefense"));
+		tag.setFloat("ArmorToughness", this.getValue("ArmorToughness"));
+		tag.setFloat("MoveSpeed", this.getValue("MoveSpeed"));
+		return tag;
+	}
+
+	@Override
+	public void deserializeNBT(NBTTagCompound nbt)
+	{
+		this.setValue("ArmorDefense", nbt.getFloat("ArmorDefense"));
+		this.setValue("ArmorTougness", nbt.getFloat("ArmorTougness"));
+		this.setValue("MoveSpeed", nbt.getFloat("MoveSpeed"));
 	}
 }

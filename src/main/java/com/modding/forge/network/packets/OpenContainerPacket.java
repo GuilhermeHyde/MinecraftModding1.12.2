@@ -9,11 +9,7 @@ public class OpenContainerPacket extends PacketHandler<OpenContainerPacket>
 {
 	public int id;
 
-	public OpenContainerPacket()
-	{
-		
-	}
-
+	public OpenContainerPacket(){}
 	public OpenContainerPacket(int id)
 	{
 		this.id = id;

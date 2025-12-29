@@ -14,6 +14,7 @@ import com.modding.forge.capability.provider.CapabilityStatsProvider;
 import com.modding.forge.capability.provider.CapabilityWeaponProvider;
 import com.modding.forge.items.ItemAccessory;
 import com.modding.forge.network.ModNetworkingManager;
+import com.modding.forge.network.packets.CapabilityStatsPacket;
 import com.modding.forge.network.packets.OpenContainerPacket;
 
 import net.minecraft.client.Minecraft;
@@ -25,23 +26,31 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.CombatRules;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class ModEventHandler
 {
@@ -57,10 +66,7 @@ public class ModEventHandler
 			event.addCapability(new ResourceLocation(Reference.modID(), "entity_level"), new CapabilityLevelProvider());
 		}
 		
-		if(event.getObject() instanceof EntityPlayer)
-		{
-			event.addCapability(new ResourceLocation(Reference.modID(), "inventory_accessory"), new CapabilityAccessoryProvider());
-		}
+		if(event.getObject() instanceof EntityPlayer) event.addCapability(new ResourceLocation(Reference.modID(), "inventory_accessory"), new CapabilityAccessoryProvider());
 	}
 	
 	@SubscribeEvent
@@ -123,17 +129,19 @@ public class ModEventHandler
 	{
 		EntityLivingBase entity = (EntityLivingBase)event.getEntityLiving();
 		CapabilityStats stats = entity.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
+		IAttributeInstance speedAttribute = entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
 		
 		if(stats != null)
 		{
-			double moveSpeed = stats.getValue("MoveSpeed") / 100F;
-			IAttributeInstance speedAttribute = entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
+			double moveSpeed = stats.getValue("MoveSpeed") / 100;
 			AttributeModifier speedModifier = speedAttribute.getModifier(MOVESPEED_MODIFIER_UUID);
-			
-			if(speedModifier == null || speedModifier.getAmount() != moveSpeed)
+			if(!entity.world.isRemote)
 			{
-				if(speedModifier != null)speedAttribute.removeModifier(MOVESPEED_MODIFIER_UUID);
-				speedAttribute.applyModifier(new AttributeModifier(MOVESPEED_MODIFIER_UUID, "CustomSpeed", moveSpeed, 2));
+				if(speedModifier == null || speedModifier.getAmount() != moveSpeed)
+				{
+					if(speedModifier != null) speedAttribute.removeModifier(MOVESPEED_MODIFIER_UUID);
+					speedAttribute.applyModifier(new AttributeModifier(MOVESPEED_MODIFIER_UUID, "CustomSpeed", moveSpeed, 2));
+				}
 			}
 		}
 	}
@@ -143,10 +151,7 @@ public class ModEventHandler
 	{
 		CapabilityStats stats = event.player.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
 		CapabilityAccessory accessorySlots = event.player.getCapability(CapabilityAccessoryProvider.INVENTORY_ACCESSORY_CAP, null);
-		
-		double attackSpeed = stats.getValue("AttackSpeed") / 100F;
 		IAttributeInstance attackAttribute = event.player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED);
-		AttributeModifier attackModifier = attackAttribute.getModifier(ATTACKSPEED_MODIFIER_UUID);
 		
 		if(stats != null)
 		{
@@ -169,10 +174,15 @@ public class ModEventHandler
 				}
 			}
 			
-			if(attackModifier == null || attackModifier.getAmount() != attackSpeed)
+			double attackSpeed = stats.getValue("AttackSpeed") / 100F;
+			AttributeModifier attackModifier = attackAttribute.getModifier(ATTACKSPEED_MODIFIER_UUID);
+			if(!event.player.world.isRemote)
 			{
-				if(attackModifier != null)attackAttribute.removeModifier(ATTACKSPEED_MODIFIER_UUID);
-				attackAttribute.applyModifier(new AttributeModifier(ATTACKSPEED_MODIFIER_UUID, "CustomPlayerAttack", attackSpeed, 2));
+				if(attackModifier == null || attackModifier.getAmount() != attackSpeed)
+				{
+					if(attackModifier != null)attackAttribute.removeModifier(ATTACKSPEED_MODIFIER_UUID);
+					attackAttribute.applyModifier(new AttributeModifier(ATTACKSPEED_MODIFIER_UUID, "CustomPlayerAttack", attackSpeed, 2));
+				}
 			}
 		}
 	}
@@ -226,6 +236,39 @@ public class ModEventHandler
 			{
 				event.getToolTip().add(TextFormatting.BLUE + " Attribute Armor");
 			}
+		}
+	}
+
+	@SubscribeEvent
+	public void onContainerOpen(PlayerContainerEvent.Open event)
+	{
+		if(!event.getEntityPlayer().world.isRemote)
+		{
+			for(Slot slot : event.getContainer().inventorySlots)
+			{
+				ItemStack stack = slot.getStack();
+				if(!stack.isEmpty() && stack.getItem() instanceof ItemSword || stack.getItem() instanceof ItemBow)
+				{
+					CapabilityWeapon cap = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
+					if(cap != null) if(cap.isEmpty()) cap.randomAttribute(stack);
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onPlayerClone(PlayerEvent.Clone event)
+	{
+		EntityPlayer oldPlayer = event.getOriginal();
+		EntityPlayer newPlayer = event.getEntityPlayer();
+		
+		CapabilityStats oldStats = oldPlayer.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
+		CapabilityStats newStats = newPlayer.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
+		
+		if(oldStats != null && newStats != null)
+		{
+			newStats.deserializeNBT(oldStats.serializeNBT());
+			if(!newPlayer.world.isRemote) ModNetworkingManager.INSTANCE.sendTo(new CapabilityStatsPacket(oldStats.serializeNBT()), (EntityPlayerMP)newPlayer);
 		}
 	}
 }
