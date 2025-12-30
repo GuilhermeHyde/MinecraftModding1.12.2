@@ -2,7 +2,9 @@ package com.modding.forge.capability;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import com.modding.forge.capability.interfaces.ICapabilityMod;
@@ -38,6 +40,20 @@ public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
 		{
 			this.setValue(entry.getKey(), entry.getValue());
 		});
+	}
+	
+	public Map<String, Float> getAttributes()
+	{
+		Map<String, Float> attributeMap = new HashMap<>();
+		if(!this.attribute.isEmpty())
+		{
+			for(Entry<String, Float> entry : this.attribute)
+			{
+				attributeMap.merge(entry.getKey(), entry.getValue(), Float::sum);
+			}
+		}
+		System.out.println(attributeMap);
+		return attributeMap;
 	}
 	
 	public String getAttributeName(int index)
