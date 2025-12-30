@@ -1,5 +1,7 @@
 package com.modding.forge.event;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import com.modding.forge.Reference;
@@ -29,6 +31,7 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
@@ -42,6 +45,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
@@ -147,6 +151,34 @@ public class ModEventHandler
 	}
 	
 	@SubscribeEvent
+	public void onEquipmentChange(LivingEquipmentChangeEvent event)
+	{
+		EntityLivingBase entity = event.getEntityLiving();
+		
+		if(event.getSlot() == EntityEquipmentSlot.MAINHAND)
+		{
+			ItemStack stackTo = event.getTo();
+			ItemStack stackFrom = event.getFrom();
+			
+			CapabilityStats stats = entity.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
+			if(stats != null)
+			{
+				if(!stackFrom.isEmpty())
+				{
+					CapabilityWeapon cap = stackFrom.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
+					if(cap != null) if(stats.isContain("MainHandBuffer"))stats.removeBuffer("MainHandBuffer");
+				}
+				
+				if(!stackTo.isEmpty())
+				{
+					CapabilityWeapon cap = stackTo.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
+					if(cap != null) if(!stats.isContain("MainHandBuffer"))stats.applyBuffer("MainHandBuffer", cap.getAttributes());
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent
 	public void onPlayerUpdate(TickEvent.PlayerTickEvent event)
 	{
 		CapabilityStats stats = event.player.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
@@ -174,7 +206,7 @@ public class ModEventHandler
 				}
 			}
 			
-			double attackSpeed = stats.getValue("AttackSpeed") / 100F;
+			double attackSpeed = stats.getValue("AttackSpeed") / 100;
 			AttributeModifier attackModifier = attackAttribute.getModifier(ATTACKSPEED_MODIFIER_UUID);
 			if(!event.player.world.isRemote)
 			{
@@ -186,7 +218,7 @@ public class ModEventHandler
 			}
 		}
 	}
-    
+	
 	@SubscribeEvent
 	public void onScreenOpened(GuiScreenEvent.InitGuiEvent.Post event)
 	{
