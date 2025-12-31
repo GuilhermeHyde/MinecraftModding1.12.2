@@ -1,14 +1,11 @@
 package com.modding.forge.containers;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.modding.forge.capability.provider.CapabilityAccessoryProvider;
 import com.modding.forge.init.InitItems;
 import com.modding.forge.items.ItemAccessory;
 import com.modding.forge.items.interfaces.IAccessory.EnumAccessoryType;
-import com.modding.forge.network.ModNetworkingManager;
-import com.modding.forge.network.packets.CapabilityAccessoryPacket;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ContainerPlayer;

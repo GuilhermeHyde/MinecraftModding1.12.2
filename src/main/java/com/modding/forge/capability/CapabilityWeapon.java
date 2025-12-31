@@ -52,7 +52,6 @@ public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
 				attributeMap.merge(entry.getKey(), entry.getValue(), Float::sum);
 			}
 		}
-		System.out.println(attributeMap);
 		return attributeMap;
 	}
 	
@@ -75,21 +74,21 @@ public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
 			do
 			{
 				chance = ThreadLocalRandom.current().nextFloat();
-				for(EnumQuality quality : EnumQuality.values()) if(chance <= quality.getChance()) this.setQuality(quality);
+				for(EnumQuality quality : EnumQuality.values()) if(chance <= quality.getChance()) cap.setQuality(quality);
 			}
 			while(cap.getQuality() == EnumQuality.NULL);
 			
-			for(int i = 0; i < this.getQuality().getAmount(); i++)
+			for(int i = 0; i < cap.getQuality().getAmount(); i++)
 			{
 				int value;
 				do
 				{
-					value = ThreadLocalRandom.current().nextInt(this.getQuality().getHarmful(), this.getQuality().getLimit());
+					value = ThreadLocalRandom.current().nextInt(cap.getQuality().getHarmful(), cap.getQuality().getLimit());
 				}
 				while(value == 0);
 				
 				String name = this.attributeName[ThreadLocalRandom.current().nextInt(this.attributeName.length)];
-				this.incrementAttritube(name, value);
+				cap.incrementAttritube(name, value);
 			}
 		}
 	}
@@ -119,7 +118,7 @@ public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
 		case EPIC:
 			return TextFormatting.YELLOW;
 		case LEGENDARY:
-			return TextFormatting.DARK_PURPLE;
+			return TextFormatting.LIGHT_PURPLE;
 		case RARE:
 			return TextFormatting.BLUE;
 		default:

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.modding.forge.capability.interfaces.ICapabilityMod;
-import com.modding.forge.capability.provider.CapabilityEquipmentProvider;
+import com.modding.forge.capability.provider.CapabilityAttributeProvider;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -16,12 +16,63 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.text.TextFormatting;
 import scala.concurrent.forkjoin.ThreadLocalRandom;
 
-public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
+public class CapabilityAttribute implements ICapabilityMod<NBTTagCompound>
 {
-	private float armorDefense, armorToughness, moveSpeed;
-	private String[] attributeName = {"ArmorDefense", "ArmorToughness", "MoveSpeed"};
+	private float attackDamage, criticalDamage, moveSpeed, attackSpeed, armorDefense, armorToughness;
+	private String[] attributeName = {"AttackDamage", "CriticalDamage", "MoveSpeed", "AttackSpeed", "ArmorDefense", "ArmorToughness"};
 	private EnumQuality quality = EnumQuality.NULL;
 	private List<Entry<String, Float>> attribute = new ArrayList<>();
+	
+	@Override
+	public NBTTagCompound serializeNBT()
+	{
+		NBTTagCompound tag = new NBTTagCompound();
+		tag.setFloat("AttackDamage", this.getValue("AttackDamage"));
+		tag.setFloat("CriticalDamage", this.getValue("CriticalDamage"));
+		tag.setFloat("MoveSpeed", this.getValue("MoveSpeed"));
+		tag.setFloat("AttackSpeed", this.getValue("AttackSpeed"));
+		tag.setFloat("ArmorDefense", this.getValue("ArmorDefense"));
+		tag.setFloat("ArmorToughness", this.getValue("ArmorToughness"));
+		
+		NBTTagList tagList = new NBTTagList();
+		for(Entry<String, Float> entry : this.attribute)
+		{
+			NBTTagCompound tag1 = new NBTTagCompound();
+			tag1.setString("K", entry.getKey());
+			tag1.setFloat("K", entry.getValue());
+			tagList.appendTag(tag1);
+			tag.setTag("Attributes", tagList);
+		}
+		return tag;
+	}
+
+	@Override
+	public void deserializeNBT(NBTTagCompound nbt)
+	{
+		this.attribute.clear();
+		this.setValue("AttackDamage", nbt.getFloat("AttackDamage"));
+		this.setValue("CriticalDamage", nbt.getFloat("CriticalDamage"));
+		this.setValue("MoveSpeed", nbt.getFloat("MoveSpeed"));
+		this.setValue("AttackSpeed", nbt.getFloat("AttackSpeed"));
+		this.setValue("ArmorDefense", nbt.getFloat("ArmorDefense"));
+		this.setValue("ArmorToughness", nbt.getFloat("ArmorToughness"));
+		
+		NBTTagList tagList = nbt.getTagList("Attributes", 10);
+		for(int i = 0; i < tagList.tagCount(); i++)
+		{
+			NBTTagCompound tag = tagList.getCompoundTagAt(i);
+			this.incrementAttribute(tag.getString("K"), tag.getFloat("V"));
+		}
+	}
+	
+	public void incrementAttribute(String name, float value)
+	{
+		this.attribute.add(new AbstractMap.SimpleEntry<>(name, value));
+		this.attribute.forEach(entry ->
+		{
+			this.setValue(entry.getKey(), entry.getValue());
+		});
+	}
 	
 	public boolean isEmpty()
 	{
@@ -31,15 +82,6 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 	public int getSize()
 	{
 		return this.attribute.size();
-	}
-	
-	public void incrementAttritube(String name, float value)
-	{
-		this.attribute.add(new AbstractMap.SimpleEntry<>(name, value));
-		this.attribute.forEach(entry ->
-		{
-			this.setValue(entry.getKey(), entry.getValue());
-		});
 	}
 	
 	public Map<String, Float> getAttributes()
@@ -100,7 +142,7 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 	
 	public void randomAttribute(ItemStack stack)
 	{
-		CapabilityEquipment cap = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+		CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
 		if(cap != null)
 		{
 			float chance;
@@ -121,22 +163,33 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 				while(value == 0);
 				
 				String name = this.attributeName[ThreadLocalRandom.current().nextInt(this.attributeName.length)];
-				cap.incrementAttritube(name, value);
+				cap.incrementAttribute(name, value);
 			}
 		}
 	}
-	
+
 	@Override
 	public void setValue(String id, float value)
 	{
 		switch(id)
 		{
-		case "ArmorDefense":
-			this.armorDefense = value;
-		case "ArmorToughness":
-			this.armorToughness = value;
+		case "AttackDamage":
+			this.attackDamage = value;
+			break;
+		case "CriticalDamage":
+			this.criticalDamage = value;
+			break;
 		case "MoveSpeed":
 			this.moveSpeed = value;
+			break;
+		case "AttackSpeed":
+			this.attackSpeed = value;
+			break;
+		case "ArmorDefense":
+			this.armorDefense = value;
+			break;
+		case "ArmorToughness":
+			this.armorToughness = value;
 			default:
 				return;
 		}
@@ -147,51 +200,20 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 	{
 		switch(id)
 		{
+		case "AttackDamage":
+			return this.attackDamage;
+		case "CriticalDamage":
+			return this.criticalDamage;
+		case "MoveSpeed":
+			return this.moveSpeed;
+		case "AttackSpeed":
+			return this.attackSpeed;
 		case "ArmorDefense":
 			return this.armorDefense;
 		case "ArmorToughness":
 			return this.armorToughness;
-		case "MoveSpeed":
-			return this.moveSpeed;
 			default:
 				return 0;
-		}
-	}
-
-	@Override
-	public NBTTagCompound serializeNBT()
-	{
-		NBTTagCompound tag = new NBTTagCompound();
-		tag.setFloat("ArmorDefense", this.getValue("ArmorDefense"));
-		tag.setFloat("ArmorToughness", this.getValue("ArmorToughness"));
-		tag.setFloat("MoveSpeed", this.getValue("MoveSpeed"));
-		tag.setString("Quality", this.getQuality().name());
-		
-		NBTTagList tagList = new NBTTagList();
-		for(Entry<String, Float> entry : this.attribute)
-		{
-			NBTTagCompound tag1 = new NBTTagCompound();
-			tag1.setString("K", entry.getKey());
-			tag1.setFloat("V", entry.getValue());
-			tagList.appendTag(tag1);
-			tag.setTag("Attributes", tagList);
-		}
-		return tag;
-	}
-
-	@Override
-	public void deserializeNBT(NBTTagCompound nbt)
-	{
-		this.setValue("ArmorDefense", nbt.getFloat("ArmorDefense"));
-		this.setValue("ArmorTougness", nbt.getFloat("ArmorTougness"));
-		this.setValue("MoveSpeed", nbt.getFloat("MoveSpeed"));
-		this.setQuality(EnumQuality.valueOf(nbt.getString("Quality")));
-		
-		NBTTagList tagList = nbt.getTagList("Attributes", 10);
-		for(int i = 0; i < tagList.tagCount(); i++)
-		{
-			NBTTagCompound value = tagList.getCompoundTagAt(i);
-			this.incrementAttritube(value.getString("K"), value.getFloat("V"));
 		}
 	}
 }

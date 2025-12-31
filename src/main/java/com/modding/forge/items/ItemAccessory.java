@@ -48,12 +48,12 @@ public class ItemAccessory extends Item implements IAccessory
 	
 	public static enum AccessoryAttribute
 	{
-		IRON_NECKLACE("iron_necklece", 0, 0, 0, 0, 50, 50),
-		IRON_RING("iron_ring", 0, 0, 0, 0, 30, 30),
-		GOLD_NECKLACE("gold_necklace", 0, 0, 50, 50, 0, 0),
-		GOLD_RING("gold_ring", 0, 0, 30, 30, 0, 0),
-		DIAMOND_NECKLACE("diamond_necklace", 50, 50, 0, 0, 0, 0),
-		DIAMOND_RING("diamond_ring", 30, 30, 0, 0, 0, 0);
+		IRON_NECKLACE("iron_necklece", 0, 0, 0, 0, 15, 5),
+		IRON_RING("iron_ring", 0, 0, 0, 0, 5, 5),
+		GOLD_NECKLACE("gold_necklace", 0, 0, 15, 5, 0, 0),
+		GOLD_RING("gold_ring", 0, 0, 5, 5, 0, 0),
+		DIAMOND_NECKLACE("diamond_necklace", 15, 5, 0, 0, 0, 0),
+		DIAMOND_RING("diamond_ring", 5, 5, 0, 0, 0, 0);
 		
 		private final String name;
 		private final float attackDamage, criticalDamage, moveSpeed, attackSpeed, armorDefense, armorToughness;

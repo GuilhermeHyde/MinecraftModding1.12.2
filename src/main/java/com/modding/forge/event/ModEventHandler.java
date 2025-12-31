@@ -1,15 +1,16 @@
 package com.modding.forge.event;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import com.modding.forge.Reference;
 import com.modding.forge.capability.CapabilityAccessory;
+import com.modding.forge.capability.CapabilityAttribute;
 import com.modding.forge.capability.CapabilityEquipment;
 import com.modding.forge.capability.CapabilityStats;
 import com.modding.forge.capability.CapabilityWeapon;
 import com.modding.forge.capability.provider.CapabilityAccessoryProvider;
+import com.modding.forge.capability.provider.CapabilityAttributeProvider;
 import com.modding.forge.capability.provider.CapabilityEquipmentProvider;
 import com.modding.forge.capability.provider.CapabilityLevelProvider;
 import com.modding.forge.capability.provider.CapabilityStatsProvider;
@@ -28,7 +29,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -38,13 +38,11 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.CombatRules;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -54,7 +52,6 @@ import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class ModEventHandler
 {
@@ -79,6 +76,7 @@ public class ModEventHandler
 		boolean isWeapon = event.getObject().getItem() instanceof ItemSword || event.getObject().getItem() instanceof ItemBow;
 		if(isWeapon) event.addCapability(new ResourceLocation(Reference.modID(), "attribute_weapon"), new CapabilityWeaponProvider());
 		if(event.getObject().getItem() instanceof ItemArmor) event.addCapability(new ResourceLocation(Reference.modID(), "attribute_equipment"), new CapabilityEquipmentProvider());
+		if(event.getObject().getItem() instanceof ItemAccessory) event.addCapability(new ResourceLocation(Reference.modID(), "attribute_accessory"), new CapabilityAttributeProvider());
 	}
 	
 	@SubscribeEvent
@@ -154,15 +152,14 @@ public class ModEventHandler
 	public void onEquipmentChange(LivingEquipmentChangeEvent event)
 	{
 		EntityLivingBase entity = event.getEntityLiving();
-		
-		if(event.getSlot() == EntityEquipmentSlot.MAINHAND)
+		CapabilityStats stats = entity.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
+		if(stats != null)
 		{
-			ItemStack stackTo = event.getTo();
-			ItemStack stackFrom = event.getFrom();
-			
-			CapabilityStats stats = entity.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
-			if(stats != null)
+			if(event.getSlot() == EntityEquipmentSlot.MAINHAND)
 			{
+				ItemStack stackTo = event.getTo();
+				ItemStack stackFrom = event.getFrom();
+				
 				if(!stackFrom.isEmpty())
 				{
 					CapabilityWeapon cap = stackFrom.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
@@ -173,6 +170,76 @@ public class ModEventHandler
 				{
 					CapabilityWeapon cap = stackTo.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
 					if(cap != null) if(!stats.isContain("MainHandBuffer"))stats.applyBuffer("MainHandBuffer", cap.getAttributes());
+				}
+			}
+			
+			final EntityEquipmentSlot[] VALID_EQUIPMENT_SLOTS = {EntityEquipmentSlot.CHEST, EntityEquipmentSlot.FEET, EntityEquipmentSlot.HEAD, EntityEquipmentSlot.LEGS};
+			for(int i = 0; i < 4; i++)
+			{
+				if(event.getSlot() == VALID_EQUIPMENT_SLOTS[i])
+				{
+					ItemStack stackTo = event.getTo();
+					ItemStack stackFrom = event.getFrom();
+					
+					if(VALID_EQUIPMENT_SLOTS[i] == EntityEquipmentSlot.HEAD)
+					{
+						if(!stackFrom.isEmpty())
+						{
+							CapabilityEquipment cap = stackFrom.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+							if(cap != null) if(stats.isContain("HelmetBuffer"))stats.removeBuffer("HelmetBuffer");
+						}
+						
+						if(!stackTo.isEmpty())
+						{
+							CapabilityEquipment cap = stackTo.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+							if(cap != null) if(!stats.isContain("HelmetBuffer"))stats.applyBuffer("HelmetBuffer", cap.getAttributes());
+						}
+					}
+					
+					if(VALID_EQUIPMENT_SLOTS[i] == EntityEquipmentSlot.CHEST)
+					{
+						if(!stackFrom.isEmpty())
+						{
+							CapabilityEquipment cap = stackFrom.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+							if(cap != null) if(stats.isContain("ChestplateBuffer"))stats.removeBuffer("ChestplateBuffer");
+						}
+						
+						if(!stackTo.isEmpty())
+						{
+							CapabilityEquipment cap = stackTo.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+							if(cap != null) if(!stats.isContain("ChestplateBuffer"))stats.applyBuffer("ChestplateBuffer", cap.getAttributes());
+						}
+					}
+					
+					if(VALID_EQUIPMENT_SLOTS[i] == EntityEquipmentSlot.FEET)
+					{
+						if(!stackFrom.isEmpty())
+						{
+							CapabilityEquipment cap = stackFrom.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+							if(cap != null) if(stats.isContain("BootsBuffer"))stats.removeBuffer("BootsBuffer");
+						}
+						
+						if(!stackTo.isEmpty())
+						{
+							CapabilityEquipment cap = stackTo.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+							if(cap != null) if(!stats.isContain("BootsBuffer"))stats.applyBuffer("BootsBuffer", cap.getAttributes());
+						}
+					}
+					
+					if(VALID_EQUIPMENT_SLOTS[i] == EntityEquipmentSlot.LEGS)
+					{
+						if(!stackFrom.isEmpty())
+						{
+							CapabilityEquipment cap = stackFrom.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+							if(cap != null) if(stats.isContain("LeggingBuffer"))stats.removeBuffer("LeggingBuffer");
+						}
+						
+						if(!stackTo.isEmpty())
+						{
+							CapabilityEquipment cap = stackTo.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+							if(cap != null) if(!stats.isContain("LeggingBuffer"))stats.applyBuffer("LeggingBuffer", cap.getAttributes());
+						}
+					}
 				}
 			}
 		}
@@ -242,6 +309,7 @@ public class ModEventHandler
 		Item item = stack.getItem();
 		CapabilityWeapon cap_weapon = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
 		CapabilityEquipment cap_equipment = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+		CapabilityAttribute cap_accessory = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
 		
 		if(cap_weapon != null)
 		{
@@ -256,6 +324,7 @@ public class ModEventHandler
 					{
 						String value = "" + cap_weapon.getAttributeValue(i);
 						if(cap_weapon.getAttributeValue(i) > 0) value = "+" + value;
+						if(cap_weapon.getAttributeName(i).equals("AttackSpeed")) value = value + "%";
 						event.getToolTip().add(cap_weapon.getColorValue(cap_weapon.getAttributeValue(i)) + "" + value + " " + cap_weapon.getAttributeName(i));
 					}
 				}
@@ -266,7 +335,52 @@ public class ModEventHandler
 		{
 			if(item instanceof ItemArmor)
 			{
-				event.getToolTip().add(TextFormatting.BLUE + " Attribute Armor");
+				if(!cap_equipment.isEmpty())
+				{
+					event.getToolTip().add("");
+					event.getToolTip().add("Armor attribute:" + cap_equipment.getColorText(cap_equipment.getQuality()) + " " + cap_equipment.getQuality());
+					
+					for(int i = 0; i < cap_equipment.getSize(); i++)
+					{
+						String value = "" + cap_equipment.getAttributeValue(i);
+						if(cap_equipment.getAttributeValue(i) > 0) value = "+" + value;
+						if(cap_equipment.getAttributeName(i).equals("MoveSpeed")) value = value + "%";
+						event.getToolTip().add(cap_equipment.getColorValue(cap_equipment.getAttributeValue(i)) + "" + value + " " + cap_equipment.getAttributeName(i));
+					}
+				}
+			}
+		}
+		
+		if(item instanceof ItemAccessory)
+		{
+			ItemAccessory accessory = (ItemAccessory)item;
+			event.getToolTip().add("");
+			event.getToolTip().add("When on accessory:");
+			for(Entry<String, Float> entry : accessory.getAttributes().entrySet())
+			{
+				String value = String.valueOf(entry.getValue().intValue());
+				if(entry.getValue() < 0) value = TextFormatting.RED + value;
+				else value = TextFormatting.BLUE + "+" + value;
+				
+				if(entry.getKey().equals("AttackSpeed") || entry.getKey().equals("MoveSpeed")) value = value + "%";
+				if(entry.getValue() != 0)event.getToolTip().add(value + " " + entry.getKey());
+			}
+			
+			if(cap_accessory != null)
+			{
+				if(!cap_accessory.isEmpty())
+				{
+					event.getToolTip().add("");
+					event.getToolTip().add("Accessory attribute:" + cap_accessory.getColorText(cap_accessory.getQuality()) + " " + cap_accessory.getQuality());
+					
+					for(int i = 0; i < cap_accessory.getSize(); i++)
+					{
+						String value = "" + cap_accessory.getAttributeValue(i);
+						if(cap_accessory.getAttributeValue(i) > 0) value = "+" + value;
+						if(cap_accessory.getAttributeName(i).equals("MoveSpeed") || cap_accessory.getAttributeName(i).equals("AttackSpeed")) value = value + "%";
+						event.getToolTip().add(cap_accessory.getColorValue(cap_accessory.getAttributeValue(i)) + "" + value + " " + cap_accessory.getAttributeName(i));
+					}
+				}
 			}
 		}
 	}
@@ -282,6 +396,18 @@ public class ModEventHandler
 				if(!stack.isEmpty() && stack.getItem() instanceof ItemSword || stack.getItem() instanceof ItemBow)
 				{
 					CapabilityWeapon cap = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
+					if(cap != null) if(cap.isEmpty()) cap.randomAttribute(stack);
+				}
+				
+				if(!stack.isEmpty() && stack.getItem() instanceof ItemArmor)
+				{
+					CapabilityEquipment cap = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+					if(cap != null) if(cap.isEmpty()) cap.randomAttribute(stack);
+				}
+				
+				if(!stack.isEmpty() && stack.getItem() instanceof ItemAccessory)
+				{
+					CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
 					if(cap != null) if(cap.isEmpty()) cap.randomAttribute(stack);
 				}
 			}

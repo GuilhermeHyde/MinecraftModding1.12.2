@@ -30,7 +30,7 @@ public class CapabilityStats implements ICapabilityMod<NBTTagCompound>
 	}
 	
 	public void applyBuffer(String name, Map<String, Float> map)
-	{
+	{	
 		for(Entry<String, Float> entry : map.entrySet())
 		{
 			this.setValue(entry.getKey(), this.getValue(entry.getKey()) + entry.getValue());

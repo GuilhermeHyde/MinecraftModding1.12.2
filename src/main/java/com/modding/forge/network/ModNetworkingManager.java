@@ -1,6 +1,7 @@
 package com.modding.forge.network;
 
 import com.modding.forge.Reference;
+import com.modding.forge.network.packets.CapabiliryAttributePacket;
 import com.modding.forge.network.packets.CapabilityAccessoryPacket;
 import com.modding.forge.network.packets.CapabilityEquipmetPacket;
 import com.modding.forge.network.packets.CapabilityLevelPacket;
@@ -24,6 +25,7 @@ public class ModNetworkingManager
 		INSTANCE.registerMessage(CapabilityAccessoryPacket.class, CapabilityAccessoryPacket.class, packetID++, Side.CLIENT);
 		INSTANCE.registerMessage(CapabilityWeaponPacket.class, CapabilityWeaponPacket.class, packetID++, Side.CLIENT);
 		INSTANCE.registerMessage(CapabilityEquipmetPacket.class, CapabilityEquipmetPacket.class, packetID++, Side.CLIENT);
+		INSTANCE.registerMessage(CapabiliryAttributePacket.class, CapabiliryAttributePacket.class, packetID++, Side.CLIENT);
 		
 		INSTANCE.registerMessage(OpenContainerPacket.class, OpenContainerPacket.class, packetID++, Side.SERVER);
 	}
