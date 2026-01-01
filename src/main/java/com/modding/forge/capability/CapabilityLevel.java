@@ -40,7 +40,7 @@ public class CapabilityLevel implements ICapabilityMod<NBTTagCompound>
 	}
 
 	@Override
-	public float getValue(String name)
+	public Object getValue(String name)
 	{
 		switch(name)
 		{
@@ -67,13 +67,13 @@ public class CapabilityLevel implements ICapabilityMod<NBTTagCompound>
 	public NBTTagCompound serializeNBT()
 	{
 		NBTTagCompound tag = new NBTTagCompound();
-		tag.setFloat("Level", this.getValue("Level"));
-		tag.setFloat("Points", this.getValue("Points"));
-		tag.setFloat("Exp", this.getValue("Exp"));
-		tag.setFloat("MaxExp", this.getValue("MaxExp"));
-		tag.setFloat("Strength", this.getValue("Strength"));
-		tag.setFloat("Resistance", this.getValue("Resistance"));
-		tag.setFloat("Agility", this.getValue("Agility"));
+		tag.setFloat("Level", (float)this.getValue("Level"));
+		tag.setFloat("Points", (float)this.getValue("Points"));
+		tag.setFloat("Exp", (float)this.getValue("Exp"));
+		tag.setFloat("MaxExp", (float)this.getValue("MaxExp"));
+		tag.setFloat("Strength", (float)this.getValue("Strength"));
+		tag.setFloat("Resistance", (float)this.getValue("Resistance"));
+		tag.setFloat("Agility", (float)this.getValue("Agility"));
 		return tag;
 	}
 

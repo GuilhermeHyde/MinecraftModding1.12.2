@@ -2,6 +2,7 @@ package com.modding.forge.items;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.modding.forge.items.interfaces.IAccessory;
 import net.minecraft.item.Item;
@@ -10,6 +11,7 @@ public class ItemAccessory extends Item implements IAccessory
 {
 	private EnumAccessoryType accessoryType;
 	private float attackDamage, criticalDamage, moveSpeed, attackSpeed, armorDefense, armorToughness;
+	public Map<String, Float> attributes = new HashMap<>();
 	
 	public ItemAccessory(EnumAccessoryType type, AccessoryAttribute stats)
 	{
@@ -44,6 +46,14 @@ public class ItemAccessory extends Item implements IAccessory
 		stats.put("ArmorDefense", this.armorDefense);
 		stats.put("ArmorToughness", this.armorToughness);
 		return stats;
+	}
+	
+	public void incrementAttribute(Map<String, Float> map)
+	{
+		for(Entry<String, Float> entry : map.entrySet())
+		{
+			this.attributes.merge(entry.getKey(), entry.getValue(), Float::sum);
+		}
 	}
 	
 	public static enum AccessoryAttribute

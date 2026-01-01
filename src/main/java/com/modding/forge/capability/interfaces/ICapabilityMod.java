@@ -6,5 +6,5 @@ import net.minecraftforge.common.util.INBTSerializable;
 public interface ICapabilityMod<T extends NBTBase> extends INBTSerializable<T>
 {
 	void setValue(String id, float value);
-	float getValue(String id);
+	Object getValue(String id);
 }

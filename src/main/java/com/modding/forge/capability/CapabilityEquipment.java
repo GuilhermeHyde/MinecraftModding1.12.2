@@ -13,7 +13,6 @@ import com.modding.forge.capability.provider.CapabilityEquipmentProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.text.TextFormatting;
 import scala.concurrent.forkjoin.ThreadLocalRandom;
 
 public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
@@ -75,29 +74,6 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 		return this.attribute.get(index).getKey();
 	}
 	
-	public TextFormatting getColorValue(float value)
-	{
-		if(value < 0) return TextFormatting.RED;
-		else return TextFormatting.BLUE;
-	}
-	
-	public TextFormatting getColorText(EnumQuality quality)
-	{
-		switch(quality)
-		{
-		case COMMON:
-			return TextFormatting.GRAY;
-		case RARE:
-			return TextFormatting.BLUE;
-		case EPIC:
-			return TextFormatting.YELLOW;
-		case LEGENDARY:
-			return TextFormatting.LIGHT_PURPLE;
-			default:
-				return null;
-		}
-	}
-	
 	public void randomAttribute(ItemStack stack)
 	{
 		CapabilityEquipment cap = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
@@ -143,7 +119,7 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 	}
 
 	@Override
-	public float getValue(String id)
+	public Object getValue(String id)
 	{
 		switch(id)
 		{
@@ -162,9 +138,9 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 	public NBTTagCompound serializeNBT()
 	{
 		NBTTagCompound tag = new NBTTagCompound();
-		tag.setFloat("ArmorDefense", this.getValue("ArmorDefense"));
-		tag.setFloat("ArmorToughness", this.getValue("ArmorToughness"));
-		tag.setFloat("MoveSpeed", this.getValue("MoveSpeed"));
+		tag.setFloat("ArmorDefense", (float)this.getValue("ArmorDefense"));
+		tag.setFloat("ArmorToughness", (float)this.getValue("ArmorToughness"));
+		tag.setFloat("MoveSpeed", (float)this.getValue("MoveSpeed"));
 		tag.setString("Quality", this.getQuality().name());
 		
 		NBTTagList tagList = new NBTTagList();

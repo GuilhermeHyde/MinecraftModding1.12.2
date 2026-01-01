@@ -25,9 +25,8 @@ public class ContainerFusionFurnace extends Container
 		this.TILE_ENTITY = tileEntity;
 		IItemHandler handler = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 		
-		this.addSlotToContainer(new SlotItemHandler(handler, 0, 30, 25)); //input1
-		this.addSlotToContainer(new SlotItemHandler(handler, 1, 71, 25)); //input2
-		
+		this.addSlotToContainer(new SlotItemHandler(handler, 0, 30, 25));
+		this.addSlotToContainer(new SlotItemHandler(handler, 1, 71, 25));
 		this.addSlotToContainer(new SlotItemHandler(handler, 2, 17, 53)
 		{
 			@Override

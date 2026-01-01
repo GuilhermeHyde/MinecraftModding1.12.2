@@ -9,6 +9,7 @@ import com.modding.forge.capability.CapabilityAttribute;
 import com.modding.forge.capability.CapabilityEquipment;
 import com.modding.forge.capability.CapabilityStats;
 import com.modding.forge.capability.CapabilityWeapon;
+import com.modding.forge.capability.EnumQuality;
 import com.modding.forge.capability.provider.CapabilityAccessoryProvider;
 import com.modding.forge.capability.provider.CapabilityAttributeProvider;
 import com.modding.forge.capability.provider.CapabilityEquipmentProvider;
@@ -89,7 +90,7 @@ public class ModEventHandler
 			
 			if(stats != null)
 			{
-				float statsDamage = stats.getValue("AttackDamage");
+				float statsDamage = (float)stats.getValue("AttackDamage");
 				float damage = event.getAmount() + statsDamage;
 				event.setAmount(damage);
 			}
@@ -102,10 +103,10 @@ public class ModEventHandler
 			
 			if(stats != null)
 			{
-				float statsDefense = stats.getValue("ArmorDefense");
+				float statsDefense = (float)stats.getValue("ArmorDefense");
 				float armorDefense = entity.getTotalArmorValue() + statsDefense;
 				
-				float statsToughness = stats.getValue("ArmorToughness");
+				float statsToughness = (float)stats.getValue("ArmorToughness");
 				float armorToughness = (float)entity.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS).getAttributeValue() + statsToughness;
 				
 				float value = CombatRules.getDamageAfterAbsorb(event.getAmount(), armorDefense, armorToughness);
@@ -121,7 +122,7 @@ public class ModEventHandler
 		
 		if(stats != null)
 		{
-			float statsCritical = stats.getValue("CriticalDamage");
+			float statsCritical = (float)stats.getValue("CriticalDamage");
 			if(event.isVanillaCritical()) event.setDamageModifier(1.5F + statsCritical);
 		}
 	}
@@ -135,7 +136,7 @@ public class ModEventHandler
 		
 		if(stats != null)
 		{
-			double moveSpeed = stats.getValue("MoveSpeed") / 100;
+			double moveSpeed = (float)stats.getValue("MoveSpeed") / 100;
 			AttributeModifier speedModifier = speedAttribute.getModifier(MOVESPEED_MODIFIER_UUID);
 			if(!entity.world.isRemote)
 			{
@@ -250,8 +251,8 @@ public class ModEventHandler
 	{
 		CapabilityStats stats = event.player.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
 		CapabilityAccessory accessorySlots = event.player.getCapability(CapabilityAccessoryProvider.INVENTORY_ACCESSORY_CAP, null);
-		IAttributeInstance attackAttribute = event.player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED);
 		
+		IAttributeInstance attackAttribute = event.player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED);
 		if(stats != null)
 		{
 			if(accessorySlots != null)
@@ -266,14 +267,20 @@ public class ModEventHandler
 					if(!stack.isEmpty() && stack.getItem() instanceof ItemAccessory)
 					{
 						ItemAccessory buffer = (ItemAccessory)stack.getItem();
+						CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
+						
 						if(isChange && isCount) stats.removeBuffer(slotKey);
-						else if(!isCount) stats.applyBuffer(slotKey, buffer.getAttributes());
+						else if(!isCount)
+						{
+							stats.applyBuffer(slotKey, buffer.getAttributes());
+							if(cap != null && !cap.getAttributes().isEmpty())stats.applyBuffer(slotKey, cap.getAttributes());
+						}
 					}
 					else if(isCount) stats.removeBuffer(slotKey);
 				}
 			}
 			
-			double attackSpeed = stats.getValue("AttackSpeed") / 100;
+			double attackSpeed = (float)stats.getValue("AttackSpeed") / 100;
 			AttributeModifier attackModifier = attackAttribute.getModifier(ATTACKSPEED_MODIFIER_UUID);
 			if(!event.player.world.isRemote)
 			{
@@ -307,45 +314,44 @@ public class ModEventHandler
 	{
 		ItemStack stack = event.getItemStack();
 		Item item = stack.getItem();
-		CapabilityWeapon cap_weapon = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
-		CapabilityEquipment cap_equipment = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
-		CapabilityAttribute cap_accessory = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
 		
-		if(cap_weapon != null)
+		CapabilityWeapon cap_weapon = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
+		if(item instanceof ItemSword || item instanceof ItemBow)
 		{
-			if(item instanceof ItemSword || item instanceof ItemBow)
+			if(cap_weapon != null)
 			{
 				if(!cap_weapon.isEmpty())
 				{
 					event.getToolTip().add("");
-					event.getToolTip().add("Weapon attribute:" + cap_weapon.getColorText(cap_weapon.getQuality()) + " " + cap_weapon.getQuality());
+					event.getToolTip().add("Weapon attribute:" + EnumQuality.getColorQuality(cap_weapon.getQuality()) + " " + cap_weapon.getQuality());
 					
 					for(int i = 0; i < cap_weapon.getSize(); i++)
 					{
 						String value = "" + cap_weapon.getAttributeValue(i);
 						if(cap_weapon.getAttributeValue(i) > 0) value = "+" + value;
 						if(cap_weapon.getAttributeName(i).equals("AttackSpeed")) value = value + "%";
-						event.getToolTip().add(cap_weapon.getColorValue(cap_weapon.getAttributeValue(i)) + "" + value + " " + cap_weapon.getAttributeName(i));
+						event.getToolTip().add(EnumQuality.getColorValue(cap_weapon.getAttributeValue(i)) + String.valueOf(value) + " " + cap_weapon.getAttributeName(i));
 					}
 				}
 			}
 		}
 		
-		if(cap_equipment != null)
+		CapabilityEquipment cap_equipment = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+		if(item instanceof ItemArmor)
 		{
-			if(item instanceof ItemArmor)
+			if(cap_equipment != null)
 			{
 				if(!cap_equipment.isEmpty())
 				{
 					event.getToolTip().add("");
-					event.getToolTip().add("Armor attribute:" + cap_equipment.getColorText(cap_equipment.getQuality()) + " " + cap_equipment.getQuality());
+					event.getToolTip().add("Armor attribute:" + EnumQuality.getColorQuality(cap_equipment.getQuality()) + " " + cap_equipment.getQuality());
 					
 					for(int i = 0; i < cap_equipment.getSize(); i++)
 					{
 						String value = "" + cap_equipment.getAttributeValue(i);
 						if(cap_equipment.getAttributeValue(i) > 0) value = "+" + value;
 						if(cap_equipment.getAttributeName(i).equals("MoveSpeed")) value = value + "%";
-						event.getToolTip().add(cap_equipment.getColorValue(cap_equipment.getAttributeValue(i)) + "" + value + " " + cap_equipment.getAttributeName(i));
+						event.getToolTip().add(EnumQuality.getColorValue(cap_equipment.getAttributeValue(i)) + String.valueOf(value) + " " + cap_equipment.getAttributeName(i));
 					}
 				}
 			}
@@ -365,20 +371,24 @@ public class ModEventHandler
 				if(entry.getKey().equals("AttackSpeed") || entry.getKey().equals("MoveSpeed")) value = value + "%";
 				if(entry.getValue() != 0)event.getToolTip().add(value + " " + entry.getKey());
 			}
-			
+		}
+		
+		CapabilityAttribute cap_accessory = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
+		if(item instanceof ItemAccessory)
+		{	
 			if(cap_accessory != null)
 			{
 				if(!cap_accessory.isEmpty())
 				{
 					event.getToolTip().add("");
-					event.getToolTip().add("Accessory attribute:" + cap_accessory.getColorText(cap_accessory.getQuality()) + " " + cap_accessory.getQuality());
+					event.getToolTip().add("Accessory attribute:" + EnumQuality.getColorQuality(cap_accessory.getQuality()) + " " + cap_accessory.getQuality());
 					
 					for(int i = 0; i < cap_accessory.getSize(); i++)
 					{
 						String value = "" + cap_accessory.getAttributeValue(i);
 						if(cap_accessory.getAttributeValue(i) > 0) value = "+" + value;
 						if(cap_accessory.getAttributeName(i).equals("MoveSpeed") || cap_accessory.getAttributeName(i).equals("AttackSpeed")) value = value + "%";
-						event.getToolTip().add(cap_accessory.getColorValue(cap_accessory.getAttributeValue(i)) + "" + value + " " + cap_accessory.getAttributeName(i));
+						event.getToolTip().add(EnumQuality.getColorValue(cap_accessory.getAttributeValue(i)) + String.valueOf(value) + " " + cap_accessory.getAttributeName(i));
 					}
 				}
 			}
@@ -408,7 +418,7 @@ public class ModEventHandler
 				if(!stack.isEmpty() && stack.getItem() instanceof ItemAccessory)
 				{
 					CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
-					if(cap != null) if(cap.isEmpty()) cap.randomAttribute(stack);
+					if(cap != null) if(cap.isEmpty())cap.randomAttribute(stack);
 				}
 			}
 		}

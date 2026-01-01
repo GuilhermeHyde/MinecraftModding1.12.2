@@ -13,7 +13,6 @@ import com.modding.forge.capability.provider.CapabilityWeaponProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.text.TextFormatting;
 import scala.concurrent.forkjoin.ThreadLocalRandom;
 
 public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
@@ -103,29 +102,6 @@ public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
 		this.quality = quality;
 	}
 	
-	public TextFormatting getColorValue(float value)
-	{
-		if(value < 0) return TextFormatting.RED;
-		else return TextFormatting.BLUE;
-	}
-	
-	public TextFormatting getColorText(EnumQuality quality)
-	{
-		switch(quality)
-		{
-		case COMMON:
-			return TextFormatting.GRAY;
-		case EPIC:
-			return TextFormatting.YELLOW;
-		case LEGENDARY:
-			return TextFormatting.LIGHT_PURPLE;
-		case RARE:
-			return TextFormatting.BLUE;
-		default:
-			return null;
-		}
-	}
-	
 	@Override
 	public void setValue(String id, float value)
 	{
@@ -146,7 +122,7 @@ public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
 	}
 
 	@Override
-	public float getValue(String id)
+	public Object getValue(String id)
 	{
 		switch(id)
 		{
@@ -165,9 +141,9 @@ public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
 	public NBTTagCompound serializeNBT()
 	{
 		NBTTagCompound tag = new NBTTagCompound();
-		tag.setFloat("AttackDamage", this.getValue("AttackDamage"));
-		tag.setFloat("CriticalDamage", this.getValue("CriticalDamage"));
-		tag.setFloat("AttackSpeed", this.getValue("AttackSpeed"));
+		tag.setFloat("AttackDamage", (float)this.getValue("AttackDamage"));
+		tag.setFloat("CriticalDamage", (float)this.getValue("CriticalDamage"));
+		tag.setFloat("AttackSpeed", (float)this.getValue("AttackSpeed"));
 		tag.setString("Quality", this.getQuality().name());
 		
 		NBTTagList tagList = new NBTTagList();
@@ -186,9 +162,9 @@ public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
 	public void deserializeNBT(NBTTagCompound tag)
 	{
 		this.attribute.clear();
-		this.setValue("AttackDamage", this.getValue("AttackDamage"));
-		this.setValue("CriticalDamage", this.getValue("CriticalDamage"));
-		this.setValue("AttackSpeed", this.getValue("AttackSpeed"));
+		this.setValue("AttackDamage", tag.getFloat("AttackDamage"));
+		this.setValue("CriticalDamage", tag.getFloat("CriticalDamage"));
+		this.setValue("AttackSpeed", tag.getFloat("AttackSpeed"));
 		this.setQuality(EnumQuality.valueOf(tag.getString("Quality")));
 		
 		NBTTagList tagList = tag.getTagList("Attributes", 10);

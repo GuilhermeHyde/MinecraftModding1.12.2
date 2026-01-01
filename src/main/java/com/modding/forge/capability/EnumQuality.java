@@ -1,5 +1,7 @@
 package com.modding.forge.capability;
 
+import net.minecraft.util.text.TextFormatting;
+
 public enum EnumQuality
 {
 	NULL(0, 0, 0, 0.0F),
@@ -37,5 +39,28 @@ public enum EnumQuality
 	public float getChance()
 	{
 		return this.chance;
+	}
+	
+	public static TextFormatting getColorValue(float value)
+	{
+		if(value < 0) return TextFormatting.RED;
+		else return TextFormatting.BLUE;
+	}
+	
+	public static TextFormatting getColorQuality(EnumQuality quality)
+	{
+		switch(quality)
+		{
+		case COMMON:
+			return TextFormatting.GRAY;
+		case RARE:
+			return TextFormatting.BLUE;
+		case EPIC:
+			return TextFormatting.YELLOW;
+		case LEGENDARY:
+			return TextFormatting.LIGHT_PURPLE;
+			default:
+				return null;
+		}
 	}
 }

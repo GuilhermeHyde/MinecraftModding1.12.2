@@ -7,7 +7,10 @@ import java.util.Set;
 
 import com.modding.forge.capability.interfaces.ICapabilityMod;
 
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.Capability;
 
 public class CapabilityStats implements ICapabilityMod<NBTTagCompound>
 {
@@ -30,19 +33,21 @@ public class CapabilityStats implements ICapabilityMod<NBTTagCompound>
 	}
 	
 	public void applyBuffer(String name, Map<String, Float> map)
-	{	
-		for(Entry<String, Float> entry : map.entrySet())
+	{
+		for(Entry<String, Float> entry : map.entrySet()) this.setValue(entry.getKey(), (float)this.getValue(entry.getKey()) + entry.getValue());
+
+		this.listBuffer.merge(name, map, (var1, var2) ->
 		{
-			this.setValue(entry.getKey(), this.getValue(entry.getKey()) + entry.getValue());
-		}
-		this.listBuffer.put(name, map);
+			var2.forEach((k, v) -> var1.merge(k, v, Float::sum));	
+			return var1;
+		});
 	}
 	
 	public void removeBuffer(String name)
 	{
 		for(Entry<String, Float> entry : this.listBuffer.get(name).entrySet())
 		{
-			this.setValue(entry.getKey(), this.getValue(entry.getKey()) - entry.getValue());
+			this.setValue(entry.getKey(), (float)this.getValue(entry.getKey()) - entry.getValue());
 		}
 		this.listBuffer.remove(name);
 	}
@@ -76,7 +81,7 @@ public class CapabilityStats implements ICapabilityMod<NBTTagCompound>
 	}
 
 	@Override
-	public float getValue(String name)
+	public Object getValue(String name)
 	{
 		switch(name)
 		{
@@ -106,12 +111,12 @@ public class CapabilityStats implements ICapabilityMod<NBTTagCompound>
 	public NBTTagCompound serializeNBT()
 	{
 		NBTTagCompound tag = new NBTTagCompound();
-		tag.setFloat("AttackDamage", this.getValue("AttackDamage"));
-		tag.setFloat("CriticalDamage", this.getValue("CriticalDamage"));
-		tag.setFloat("MoveSpeed", this.getValue("MoveSpeed"));
-		tag.setFloat("AttackSpeed", this.getValue("AttackSpeed"));
-		tag.setFloat("ArmorDefense", this.getValue("ArmorDefense"));
-		tag.setFloat("ArmorToughness", this.getValue("ArmorToughness"));
+		tag.setFloat("AttackDamage", (float)this.getValue("AttackDamage"));
+		tag.setFloat("CriticalDamage", (float)this.getValue("CriticalDamage"));
+		tag.setFloat("MoveSpeed", (float)this.getValue("MoveSpeed"));
+		tag.setFloat("AttackSpeed", (float)this.getValue("AttackSpeed"));
+		tag.setFloat("ArmorDefense", (float)this.getValue("ArmorDefense"));
+		tag.setFloat("ArmorToughness", (float)this.getValue("ArmorToughness"));
 		tag.setTag("Buffer", this.saveMapToNBT(this.listBuffer));
 		return tag;
 	}
