@@ -1,10 +1,13 @@
 package com.modding.forge.network.packets;
 
 import com.modding.forge.capability.CapabilityAttribute;
+import com.modding.forge.capability.CapabilityEquipment;
 import com.modding.forge.capability.provider.CapabilityAttributeProvider;
+import com.modding.forge.capability.provider.CapabilityEquipmentProvider;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -31,7 +34,7 @@ public class CapabiliryAttributePacket extends PacketHandler<CapabiliryAttribute
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
-		buf.writeByte(index);
+		buf.writeInt(index);
 		ByteBufUtils.writeTag(buf, data);
 	}
 
@@ -40,12 +43,16 @@ public class CapabiliryAttributePacket extends PacketHandler<CapabiliryAttribute
 	{
 		if(player != null && player.world != null)
 		{
-			ItemStack stack = player.inventory.getStackInSlot(message.index);
-			if(!stack.isEmpty())
-			{
-				CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
-				if(cap != null) cap.deserializeNBT(message.data);
-			}
+	        Container container = player.openContainer;
+	        if(container != null && message.index >= 0 && message.index < container.inventorySlots.size())
+	        {
+	            ItemStack stack = container.getSlot(message.index).getStack();
+	            if(!stack.isEmpty() && message.data != null)
+	            {
+	                CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
+	                if(cap != null) cap.deserializeNBT(message.data);
+	            }
+	        }
 		}
 	}
 

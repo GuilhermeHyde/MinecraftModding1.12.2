@@ -8,9 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.modding.forge.capability.interfaces.ICapabilityMod;
-import com.modding.forge.capability.provider.CapabilityEquipmentProvider;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import scala.concurrent.forkjoin.ThreadLocalRandom;
@@ -22,6 +20,31 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 	private EnumQuality quality = EnumQuality.NULL;
 	private List<Entry<String, Float>> attribute = new ArrayList<>();
 	
+	public void randomAttribute()
+	{
+		if(this.isEmpty()) this.attribute.clear();
+		float chance;
+		do
+		{
+			chance = ThreadLocalRandom.current().nextFloat();
+			for(EnumQuality quality : EnumQuality.values()) if(chance <= quality.getChance()) this.setQuality(quality);
+		}
+		while(this.getQuality() == EnumQuality.NULL);
+		
+		for(int i = 0; i < this.getQuality().getAmount(); i++)
+		{
+			int value;
+			do
+			{
+				value = ThreadLocalRandom.current().nextInt(this.getQuality().getHarmful(), this.getQuality().getLimit());
+			}
+			while(value == 0);
+			
+			String name = this.attributeName[ThreadLocalRandom.current().nextInt(this.attributeName.length)];
+			this.incrementAttribute(name, value);
+		}
+	}
+	
 	public boolean isEmpty()
 	{
 		return this.attribute.isEmpty();
@@ -32,7 +55,7 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 		return this.attribute.size();
 	}
 	
-	public void incrementAttritube(String name, float value)
+	public void incrementAttribute(String name, float value)
 	{
 		this.attribute.add(new AbstractMap.SimpleEntry<>(name, value));
 		this.attribute.forEach(entry ->
@@ -72,34 +95,6 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 	public String getAttributeName(int index)
 	{
 		return this.attribute.get(index).getKey();
-	}
-	
-	public void randomAttribute(ItemStack stack)
-	{
-		CapabilityEquipment cap = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
-		if(cap != null)
-		{
-			float chance;
-			do
-			{
-				chance = ThreadLocalRandom.current().nextFloat();
-				for(EnumQuality quality : EnumQuality.values()) if(chance <= quality.getChance()) cap.setQuality(quality);
-			}
-			while(cap.getQuality() == EnumQuality.NULL);
-			
-			for(int i = 0; i < cap.getQuality().getAmount(); i++)
-			{
-				int value;
-				do
-				{
-					value = ThreadLocalRandom.current().nextInt(cap.getQuality().getHarmful(), cap.getQuality().getLimit());
-				}
-				while(value == 0);
-				
-				String name = this.attributeName[ThreadLocalRandom.current().nextInt(this.attributeName.length)];
-				cap.incrementAttritube(name, value);
-			}
-		}
 	}
 	
 	@Override
@@ -142,7 +137,6 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 		tag.setFloat("ArmorToughness", (float)this.getValue("ArmorToughness"));
 		tag.setFloat("MoveSpeed", (float)this.getValue("MoveSpeed"));
 		tag.setString("Quality", this.getQuality().name());
-		
 		NBTTagList tagList = new NBTTagList();
 		for(Entry<String, Float> entry : this.attribute)
 		{
@@ -150,14 +144,15 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 			tag1.setString("K", entry.getKey());
 			tag1.setFloat("V", entry.getValue());
 			tagList.appendTag(tag1);
-			tag.setTag("Attributes", tagList);
 		}
+		tag.setTag("Attributes", tagList);
 		return tag;
 	}
 
 	@Override
 	public void deserializeNBT(NBTTagCompound nbt)
 	{
+		this.attribute.clear();
 		this.setValue("ArmorDefense", nbt.getFloat("ArmorDefense"));
 		this.setValue("ArmorTougness", nbt.getFloat("ArmorTougness"));
 		this.setValue("MoveSpeed", nbt.getFloat("MoveSpeed"));
@@ -167,7 +162,7 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 		for(int i = 0; i < tagList.tagCount(); i++)
 		{
 			NBTTagCompound value = tagList.getCompoundTagAt(i);
-			this.incrementAttritube(value.getString("K"), value.getFloat("V"));
+			this.incrementAttribute(value.getString("K"), value.getFloat("V"));
 		}
 	}
 }

@@ -17,8 +17,12 @@ import com.modding.forge.capability.provider.CapabilityLevelProvider;
 import com.modding.forge.capability.provider.CapabilityStatsProvider;
 import com.modding.forge.capability.provider.CapabilityWeaponProvider;
 import com.modding.forge.items.ItemAccessory;
+import com.modding.forge.items.interfaces.IAccessory;
 import com.modding.forge.network.ModNetworkingManager;
+import com.modding.forge.network.packets.CapabiliryAttributePacket;
+import com.modding.forge.network.packets.CapabilityEquipmetPacket;
 import com.modding.forge.network.packets.CapabilityStatsPacket;
+import com.modding.forge.network.packets.CapabilityWeaponPacket;
 import com.modding.forge.network.packets.OpenContainerPacket;
 
 import net.minecraft.client.Minecraft;
@@ -52,6 +56,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class ModEventHandler
@@ -77,7 +82,7 @@ public class ModEventHandler
 		boolean isWeapon = event.getObject().getItem() instanceof ItemSword || event.getObject().getItem() instanceof ItemBow;
 		if(isWeapon) event.addCapability(new ResourceLocation(Reference.modID(), "attribute_weapon"), new CapabilityWeaponProvider());
 		if(event.getObject().getItem() instanceof ItemArmor) event.addCapability(new ResourceLocation(Reference.modID(), "attribute_equipment"), new CapabilityEquipmentProvider());
-		if(event.getObject().getItem() instanceof ItemAccessory) event.addCapability(new ResourceLocation(Reference.modID(), "attribute_accessory"), new CapabilityAttributeProvider());
+		if(event.getObject().getItem() instanceof IAccessory) event.addCapability(new ResourceLocation(Reference.modID(), "attribute_accessory"), new CapabilityAttributeProvider());
 	}
 	
 	@SubscribeEvent
@@ -315,49 +320,43 @@ public class ModEventHandler
 		ItemStack stack = event.getItemStack();
 		Item item = stack.getItem();
 		
-		CapabilityWeapon cap_weapon = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
 		if(item instanceof ItemSword || item instanceof ItemBow)
 		{
-			if(cap_weapon != null)
+			CapabilityWeapon cap = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
+			if(cap != null && !cap.isEmpty())
 			{
-				if(!cap_weapon.isEmpty())
+				event.getToolTip().add("");
+				event.getToolTip().add("Weapon attribute:" + EnumQuality.getColorQuality(cap.getQuality()) + " " + cap.getQuality());
+				
+				for(int i = 0; i < cap.getSize(); i++)
 				{
-					event.getToolTip().add("");
-					event.getToolTip().add("Weapon attribute:" + EnumQuality.getColorQuality(cap_weapon.getQuality()) + " " + cap_weapon.getQuality());
-					
-					for(int i = 0; i < cap_weapon.getSize(); i++)
-					{
-						String value = "" + cap_weapon.getAttributeValue(i);
-						if(cap_weapon.getAttributeValue(i) > 0) value = "+" + value;
-						if(cap_weapon.getAttributeName(i).equals("AttackSpeed")) value = value + "%";
-						event.getToolTip().add(EnumQuality.getColorValue(cap_weapon.getAttributeValue(i)) + String.valueOf(value) + " " + cap_weapon.getAttributeName(i));
-					}
+					String value = "" + cap.getAttributeValue(i);
+					if(cap.getAttributeValue(i) > 0) value = "+" + value;
+					if(cap.getAttributeName(i).equals("AttackSpeed")) value = value + "%";
+					event.getToolTip().add(EnumQuality.getColorValue(cap.getAttributeValue(i)) + String.valueOf(value) + " " + cap.getAttributeName(i));
 				}
 			}
 		}
 		
-		CapabilityEquipment cap_equipment = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
 		if(item instanceof ItemArmor)
 		{
-			if(cap_equipment != null)
+			CapabilityEquipment cap = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+			if(cap != null && !cap.isEmpty())
 			{
-				if(!cap_equipment.isEmpty())
+				event.getToolTip().add("");
+				event.getToolTip().add("Armor attribute:" + EnumQuality.getColorQuality(cap.getQuality()) + " " + cap.getQuality());
+				
+				for(int i = 0; i < cap.getSize(); i++)
 				{
-					event.getToolTip().add("");
-					event.getToolTip().add("Armor attribute:" + EnumQuality.getColorQuality(cap_equipment.getQuality()) + " " + cap_equipment.getQuality());
-					
-					for(int i = 0; i < cap_equipment.getSize(); i++)
-					{
-						String value = "" + cap_equipment.getAttributeValue(i);
-						if(cap_equipment.getAttributeValue(i) > 0) value = "+" + value;
-						if(cap_equipment.getAttributeName(i).equals("MoveSpeed")) value = value + "%";
-						event.getToolTip().add(EnumQuality.getColorValue(cap_equipment.getAttributeValue(i)) + String.valueOf(value) + " " + cap_equipment.getAttributeName(i));
-					}
+					String value = "" + cap.getAttributeValue(i);
+					if(cap.getAttributeValue(i) > 0) value = "+" + value;
+					if(cap.getAttributeName(i).equals("MoveSpeed")) value = value + "%";
+					event.getToolTip().add(EnumQuality.getColorValue(cap.getAttributeValue(i)) + String.valueOf(value) + " " + cap.getAttributeName(i));
 				}
 			}
 		}
 		
-		if(item instanceof ItemAccessory)
+		if(item instanceof IAccessory)
 		{
 			ItemAccessory accessory = (ItemAccessory)item;
 			event.getToolTip().add("");
@@ -371,54 +370,19 @@ public class ModEventHandler
 				if(entry.getKey().equals("AttackSpeed") || entry.getKey().equals("MoveSpeed")) value = value + "%";
 				if(entry.getValue() != 0)event.getToolTip().add(value + " " + entry.getKey());
 			}
-		}
-		
-		CapabilityAttribute cap_accessory = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
-		if(item instanceof ItemAccessory)
-		{	
-			if(cap_accessory != null)
+			
+			CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
+			if(cap != null && !cap.isEmpty())
 			{
-				if(!cap_accessory.isEmpty())
-				{
-					event.getToolTip().add("");
-					event.getToolTip().add("Accessory attribute:" + EnumQuality.getColorQuality(cap_accessory.getQuality()) + " " + cap_accessory.getQuality());
-					
-					for(int i = 0; i < cap_accessory.getSize(); i++)
-					{
-						String value = "" + cap_accessory.getAttributeValue(i);
-						if(cap_accessory.getAttributeValue(i) > 0) value = "+" + value;
-						if(cap_accessory.getAttributeName(i).equals("MoveSpeed") || cap_accessory.getAttributeName(i).equals("AttackSpeed")) value = value + "%";
-						event.getToolTip().add(EnumQuality.getColorValue(cap_accessory.getAttributeValue(i)) + String.valueOf(value) + " " + cap_accessory.getAttributeName(i));
-					}
-				}
-			}
-		}
-	}
-
-	@SubscribeEvent
-	public void onContainerOpen(PlayerContainerEvent.Open event)
-	{
-		if(!event.getEntityPlayer().world.isRemote)
-		{
-			for(Slot slot : event.getContainer().inventorySlots)
-			{
-				ItemStack stack = slot.getStack();
-				if(!stack.isEmpty() && stack.getItem() instanceof ItemSword || stack.getItem() instanceof ItemBow)
-				{
-					CapabilityWeapon cap = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
-					if(cap != null) if(cap.isEmpty()) cap.randomAttribute(stack);
-				}
+				event.getToolTip().add("");
+				event.getToolTip().add("Accessory attribute:" + EnumQuality.getColorQuality(cap.getQuality()) + " " + cap.getQuality());
 				
-				if(!stack.isEmpty() && stack.getItem() instanceof ItemArmor)
+				for(int i = 0; i < cap.getSize(); i++)
 				{
-					CapabilityEquipment cap = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
-					if(cap != null) if(cap.isEmpty()) cap.randomAttribute(stack);
-				}
-				
-				if(!stack.isEmpty() && stack.getItem() instanceof ItemAccessory)
-				{
-					CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
-					if(cap != null) if(cap.isEmpty())cap.randomAttribute(stack);
+					String value = "" + cap.getAttributeValue(i);
+					if(cap.getAttributeValue(i) > 0) value = "+" + value;
+					if(cap.getAttributeName(i).equals("MoveSpeed") || cap.getAttributeName(i).equals("AttackSpeed")) value = value + "%";
+					event.getToolTip().add(EnumQuality.getColorValue(cap.getAttributeValue(i)) + String.valueOf(value) + " " + cap.getAttributeName(i));
 				}
 			}
 		}
@@ -438,5 +402,76 @@ public class ModEventHandler
 			newStats.deserializeNBT(oldStats.serializeNBT());
 			if(!newPlayer.world.isRemote) ModNetworkingManager.INSTANCE.sendTo(new CapabilityStatsPacket(oldStats.serializeNBT()), (EntityPlayerMP)newPlayer);
 		}
+	}
+	
+	@SubscribeEvent
+	public void onContainerOpen(PlayerContainerEvent event)
+	{
+	    if(!event.getEntityPlayer().world.isRemote)
+	    {
+		    EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
+		    for(Slot slot : event.getContainer().inventorySlots)
+		    {
+		        ItemStack stack = slot.getStack();
+		        if(!stack.isEmpty())
+		        {
+			        if (stack.getItem() instanceof ItemSword || stack.getItem() instanceof ItemBow)
+			        {
+			            CapabilityWeapon cap = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
+			            if (cap != null && cap.isEmpty())
+			            {
+			                cap.randomAttribute();
+			                ModNetworkingManager.INSTANCE.sendTo(new CapabilityWeaponPacket(slot.slotNumber, cap.serializeNBT()), player);
+			            }
+			        }
+			        
+			        if (stack.getItem() instanceof ItemArmor)
+			        {
+			            CapabilityEquipment cap = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+			            if (cap != null && cap.isEmpty())
+			            {
+			                cap.randomAttribute();
+			                ModNetworkingManager.INSTANCE.sendTo(new CapabilityEquipmetPacket(slot.slotNumber, cap.serializeNBT()), player);
+			            }
+			        }
+			        
+			        if (stack.getItem() instanceof IAccessory)
+			        {
+			            CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
+			            if (cap != null && cap.isEmpty())
+			            {
+			                cap.randomAttribute();
+			                ModNetworkingManager.INSTANCE.sendTo(new CapabiliryAttributePacket(slot.slotNumber, cap.serializeNBT()), player);
+			            }
+			        }
+		        }
+		    }
+	    }
+	}
+	
+	@SubscribeEvent
+	public void onCrafted(ItemCraftedEvent event)
+	{
+	    ItemStack stack = event.crafting;
+	    if (!stack.isEmpty())
+	    {
+			if(stack.getItem() instanceof ItemSword || stack.getItem() instanceof ItemBow)
+			{
+				CapabilityWeapon cap = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
+				if(cap != null && cap.isEmpty()) cap.randomAttribute();
+			}
+			
+			if(stack.getItem() instanceof ItemArmor)
+			{
+				CapabilityEquipment cap = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+				if(cap != null && cap.isEmpty()) cap.randomAttribute();
+			}
+			
+			if(stack.getItem() instanceof IAccessory)
+			{
+				CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
+				if(cap != null && cap.isEmpty()) cap.randomAttribute();
+			}
+	    }
 	}
 }

@@ -8,9 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.modding.forge.capability.interfaces.ICapabilityMod;
-import com.modding.forge.capability.provider.CapabilityAttributeProvider;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import scala.concurrent.forkjoin.ThreadLocalRandom;
@@ -21,6 +19,31 @@ public class CapabilityAttribute implements ICapabilityMod<NBTTagCompound>
 	private String[] attributeName = {"AttackDamage", "CriticalDamage", "MoveSpeed", "AttackSpeed", "ArmorDefense", "ArmorToughness"};
 	private EnumQuality quality = EnumQuality.NULL;
 	private List<Entry<String, Float>> attribute = new ArrayList<>();
+	
+	public void randomAttribute()
+	{
+		if(!this.isEmpty()) this.attribute.clear();
+		float chance;
+		do
+		{
+			chance = ThreadLocalRandom.current().nextFloat();
+			for(EnumQuality quality : EnumQuality.values()) if(chance <= quality.getChance()) this.setQuality(quality);
+		}
+		while(this.getQuality() == EnumQuality.NULL);
+		
+		for(int i = 0; i < this.getQuality().getAmount(); i++)
+		{
+			int value;
+			do
+			{
+				value = ThreadLocalRandom.current().nextInt(this.getQuality().getHarmful(), this.getQuality().getLimit());
+			}
+			while(value == 0);
+			
+			String name = this.attributeName[ThreadLocalRandom.current().nextInt(this.attributeName.length)];
+			this.incrementAttribute(name, value);
+		}
+	}
 	
 	public void incrementAttribute(String name, float value)
 	{
@@ -72,34 +95,6 @@ public class CapabilityAttribute implements ICapabilityMod<NBTTagCompound>
 	public String getAttributeName(int index)
 	{
 		return this.attribute.get(index).getKey();
-	}
-	
-	public void randomAttribute(ItemStack stack)
-	{
-		CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
-		if(cap != null)
-		{
-			float chance;
-			do
-			{
-				chance = ThreadLocalRandom.current().nextFloat();
-				for(EnumQuality quality : EnumQuality.values()) if(chance <= quality.getChance()) cap.setQuality(quality);
-			}
-			while(cap.getQuality() == EnumQuality.NULL);
-			
-			for(int i = 0; i < cap.getQuality().getAmount(); i++)
-			{
-				int value;
-				do
-				{
-					value = ThreadLocalRandom.current().nextInt(cap.getQuality().getHarmful(), cap.getQuality().getLimit());
-				}
-				while(value == 0);
-				
-				String name = this.attributeName[ThreadLocalRandom.current().nextInt(this.attributeName.length)];
-				cap.incrementAttribute(name, value);
-			}
-		}
 	}
 
 	@Override

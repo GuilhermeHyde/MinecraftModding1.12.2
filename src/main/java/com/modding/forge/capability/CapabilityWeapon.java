@@ -8,9 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.modding.forge.capability.interfaces.ICapabilityMod;
-import com.modding.forge.capability.provider.CapabilityWeaponProvider;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import scala.concurrent.forkjoin.ThreadLocalRandom;
@@ -21,7 +19,32 @@ public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
 	private String[] attributeName = {"AttackDamage", "CriticalDamage", "AttackSpeed"};
 	private EnumQuality quality = EnumQuality.NULL;
 	private List<Entry<String, Float>> attribute = new ArrayList<>();
-
+	
+	public void randomAttribute()
+	{
+		if(!this.isEmpty()) this.attribute.clear();
+		float chance;
+		do
+		{
+			chance = ThreadLocalRandom.current().nextFloat();
+			for(EnumQuality quality : EnumQuality.values()) if(chance <= quality.getChance()) this.setQuality(quality);
+		}
+		while(this.getQuality() == EnumQuality.NULL);
+		
+		for(int i = 0; i < this.getQuality().getAmount(); i++)
+		{
+			int value;
+			do
+			{
+				value = ThreadLocalRandom.current().nextInt(this.getQuality().getHarmful(), this.getQuality().getLimit());
+			}
+			while(value == 0);
+			
+			String name = this.attributeName[ThreadLocalRandom.current().nextInt(this.attributeName.length)];
+			this.incrementAttribute(name, value);
+		}
+	}
+	
 	public boolean isEmpty()
 	{
 		return this.attribute.isEmpty();
@@ -32,7 +55,7 @@ public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
 		return this.attribute.size();
 	}
 	
-	public void incrementAttritube(String name, float value)
+	public void incrementAttribute(String name, float value)
 	{
 		this.attribute.add(new AbstractMap.SimpleEntry<>(name, value));
 		this.attribute.forEach(entry ->
@@ -62,34 +85,6 @@ public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
 	public int getAttributeValue(int index)
 	{
 		return this.attribute.get(index).getValue().intValue();
-	}
-	
-	public void randomAttribute(ItemStack stack)
-	{
-		CapabilityWeapon cap = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
-		if(cap != null)
-		{
-			float chance;
-			do
-			{
-				chance = ThreadLocalRandom.current().nextFloat();
-				for(EnumQuality quality : EnumQuality.values()) if(chance <= quality.getChance()) cap.setQuality(quality);
-			}
-			while(cap.getQuality() == EnumQuality.NULL);
-			
-			for(int i = 0; i < cap.getQuality().getAmount(); i++)
-			{
-				int value;
-				do
-				{
-					value = ThreadLocalRandom.current().nextInt(cap.getQuality().getHarmful(), cap.getQuality().getLimit());
-				}
-				while(value == 0);
-				
-				String name = this.attributeName[ThreadLocalRandom.current().nextInt(this.attributeName.length)];
-				cap.incrementAttritube(name, value);
-			}
-		}
 	}
 	
 	public EnumQuality getQuality()
@@ -171,7 +166,7 @@ public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
 		for(int i = 0; i < tagList.tagCount(); i++)
 		{
 			NBTTagCompound value = tagList.getCompoundTagAt(i);
-			this.incrementAttritube(value.getString("K"), value.getFloat("V"));
+			this.incrementAttribute(value.getString("K"), value.getFloat("V"));
 		}
 	}
 }
