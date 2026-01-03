@@ -1,9 +1,7 @@
 package com.modding.forge.network.packets;
 
 import com.modding.forge.capability.CapabilityAttribute;
-import com.modding.forge.capability.CapabilityEquipment;
 import com.modding.forge.capability.provider.CapabilityAttributeProvider;
-import com.modding.forge.capability.provider.CapabilityEquipmentProvider;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,13 +10,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
-public class CapabiliryAttributePacket extends PacketHandler<CapabiliryAttributePacket>
+public class CapabilityAttributePacket extends PacketHandler<CapabilityAttributePacket>
 {
 	private NBTTagCompound data;
 	private int index;
 	
-	public CapabiliryAttributePacket() {}
-	public CapabiliryAttributePacket(int index, NBTTagCompound data)
+	public CapabilityAttributePacket() {}
+	public CapabilityAttributePacket(int index, NBTTagCompound data)
 	{
 		this.data = data;
 		this.index = index;
@@ -39,7 +37,7 @@ public class CapabiliryAttributePacket extends PacketHandler<CapabiliryAttribute
 	}
 
 	@Override
-	public void handlerClient(CapabiliryAttributePacket message, EntityPlayer player)
+	public void handlerClient(CapabilityAttributePacket message, EntityPlayer player)
 	{
 		if(player != null && player.world != null)
 		{
@@ -57,7 +55,7 @@ public class CapabiliryAttributePacket extends PacketHandler<CapabiliryAttribute
 	}
 
 	@Override
-	public void handlerServer(CapabiliryAttributePacket message, EntityPlayer player)
+	public void handlerServer(CapabilityAttributePacket message, EntityPlayer player)
 	{
 		
 	}

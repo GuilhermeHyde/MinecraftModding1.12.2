@@ -11,26 +11,22 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 public class CapabilityAccessoryPacket extends PacketHandler<CapabilityAccessoryPacket>
 {
 	private NBTTagCompound data;
-	private int id;
-
+	
 	public CapabilityAccessoryPacket(){}
-	public CapabilityAccessoryPacket(NBTTagCompound data, int id)
+	public CapabilityAccessoryPacket(NBTTagCompound data)
 	{
 		this.data = data;
-		this.id = id;
 	}
 	
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
-		this.id = buf.readInt();
 		this.data = ByteBufUtils.readTag(buf);
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
-		buf.writeByte(id);
 		ByteBufUtils.writeTag(buf, data);
 	}
 
@@ -39,12 +35,8 @@ public class CapabilityAccessoryPacket extends PacketHandler<CapabilityAccessory
 	{
 		if(player != null && player.world != null)
 		{
-			EntityPlayer entity = (EntityPlayer)player.world.getEntityByID(message.id);
-			if(entity != null)
-			{
-				CapabilityAccessory capability = entity.getCapability(CapabilityAccessoryProvider.INVENTORY_ACCESSORY_CAP, null);
-				if(capability != null) capability.deserializeNBT(message.data);
-			}
+			CapabilityAccessory cap = player.getCapability(CapabilityAccessoryProvider.INVENTORY_ACCESSORY_CAP, null);
+			if(cap != null && message.data != null) cap.deserializeNBT(message.data);
 		}
 	}
 	

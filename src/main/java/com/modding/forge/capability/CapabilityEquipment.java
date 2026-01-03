@@ -98,16 +98,16 @@ public class CapabilityEquipment implements ICapabilityMod<NBTTagCompound>
 	}
 	
 	@Override
-	public void setValue(String id, float value)
+	public void setValue(String id, Object value)
 	{
 		switch(id)
 		{
 		case "ArmorDefense":
-			this.armorDefense = value;
+			this.armorDefense = (float)value;
 		case "ArmorToughness":
-			this.armorToughness = value;
+			this.armorToughness = (float)value;
 		case "MoveSpeed":
-			this.moveSpeed = value;
+			this.moveSpeed = (float)value;
 			default:
 				return;
 		}

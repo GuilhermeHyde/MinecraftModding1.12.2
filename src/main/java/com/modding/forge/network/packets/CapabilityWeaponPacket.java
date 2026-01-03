@@ -1,8 +1,6 @@
 package com.modding.forge.network.packets;
 
-import com.modding.forge.capability.CapabilityEquipment;
 import com.modding.forge.capability.CapabilityWeapon;
-import com.modding.forge.capability.provider.CapabilityEquipmentProvider;
 import com.modding.forge.capability.provider.CapabilityWeaponProvider;
 
 import io.netty.buffer.ByteBuf;

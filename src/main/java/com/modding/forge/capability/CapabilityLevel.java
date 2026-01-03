@@ -9,30 +9,30 @@ public class CapabilityLevel implements ICapabilityMod<NBTTagCompound>
 	private float level, points, exp, maxExp, strength, resistance, agility;
 	
 	@Override
-	public void setValue(String name, float value)
+	public void setValue(String name, Object value)
 	{
 		switch(name)
 		{
 		case "Level":
-			this.level = value;
+			this.level = (float)value;
 			break;
 		case "Points":
-			this.points = value;
+			this.points = (float)value;
 			break;
 		case "Exp":
-			this.exp = value;
+			this.exp = (float)value;
 			break;
 		case "MaxExp":
-			this.maxExp = value;
+			this.maxExp = (float)value;
 			break;
 		case "Strength":
-			this.strength = value;
+			this.strength = (float)value;
 			break;
 		case "Resistance":
-			this.resistance = value;
+			this.resistance = (float)value;
 			break;
 		case "Agility":
-			this.agility = value;
+			this.agility = (float)value;
 			break;
 			default:
 				return;

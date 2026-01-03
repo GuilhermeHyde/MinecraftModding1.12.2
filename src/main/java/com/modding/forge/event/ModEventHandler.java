@@ -19,7 +19,7 @@ import com.modding.forge.capability.provider.CapabilityWeaponProvider;
 import com.modding.forge.items.ItemAccessory;
 import com.modding.forge.items.interfaces.IAccessory;
 import com.modding.forge.network.ModNetworkingManager;
-import com.modding.forge.network.packets.CapabiliryAttributePacket;
+import com.modding.forge.network.packets.CapabilityAttributePacket;
 import com.modding.forge.network.packets.CapabilityEquipmetPacket;
 import com.modding.forge.network.packets.CapabilityStatsPacket;
 import com.modding.forge.network.packets.CapabilityWeaponPacket;
@@ -80,6 +80,7 @@ public class ModEventHandler
 	public void onCapabilitiesItemStack(AttachCapabilitiesEvent<ItemStack> event)
 	{
 		boolean isWeapon = event.getObject().getItem() instanceof ItemSword || event.getObject().getItem() instanceof ItemBow;
+		
 		if(isWeapon) event.addCapability(new ResourceLocation(Reference.modID(), "attribute_weapon"), new CapabilityWeaponProvider());
 		if(event.getObject().getItem() instanceof ItemArmor) event.addCapability(new ResourceLocation(Reference.modID(), "attribute_equipment"), new CapabilityEquipmentProvider());
 		if(event.getObject().getItem() instanceof IAccessory) event.addCapability(new ResourceLocation(Reference.modID(), "attribute_accessory"), new CapabilityAttributeProvider());
@@ -159,6 +160,7 @@ public class ModEventHandler
 	{
 		EntityLivingBase entity = event.getEntityLiving();
 		CapabilityStats stats = entity.getCapability(CapabilityStatsProvider.ENTITY_STATS_CAP, null);
+		
 		if(stats != null)
 		{
 			if(event.getSlot() == EntityEquipmentSlot.MAINHAND)
@@ -297,7 +299,7 @@ public class ModEventHandler
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void onScreenOpened(GuiScreenEvent.InitGuiEvent.Post event)
 	{
@@ -330,10 +332,10 @@ public class ModEventHandler
 				
 				for(int i = 0; i < cap.getSize(); i++)
 				{
-					String value = "" + cap.getAttributeValue(i);
-					if(cap.getAttributeValue(i) > 0) value = "+" + value;
+					String value = EnumQuality.getColorValue(cap.getAttributeValue(i)) + String.valueOf(cap.getAttributeValue(i));
+					if(cap.getAttributeValue(i) > 0) value = TextFormatting.BLUE + "+" + value;
 					if(cap.getAttributeName(i).equals("AttackSpeed")) value = value + "%";
-					event.getToolTip().add(EnumQuality.getColorValue(cap.getAttributeValue(i)) + String.valueOf(value) + " " + cap.getAttributeName(i));
+					event.getToolTip().add(" " + value + " " + cap.getAttributeName(i));
 				}
 			}
 		}
@@ -348,10 +350,10 @@ public class ModEventHandler
 				
 				for(int i = 0; i < cap.getSize(); i++)
 				{
-					String value = "" + cap.getAttributeValue(i);
-					if(cap.getAttributeValue(i) > 0) value = "+" + value;
+					String value = EnumQuality.getColorValue(cap.getAttributeValue(i)) + String.valueOf(cap.getAttributeValue(i));
+					if(cap.getAttributeValue(i) > 0) value = TextFormatting.BLUE + "+" + value;
 					if(cap.getAttributeName(i).equals("MoveSpeed")) value = value + "%";
-					event.getToolTip().add(EnumQuality.getColorValue(cap.getAttributeValue(i)) + String.valueOf(value) + " " + cap.getAttributeName(i));
+					event.getToolTip().add(" " + value + " " + cap.getAttributeName(i));
 				}
 			}
 		}
@@ -361,14 +363,13 @@ public class ModEventHandler
 			ItemAccessory accessory = (ItemAccessory)item;
 			event.getToolTip().add("");
 			event.getToolTip().add("When on accessory:");
+			
 			for(Entry<String, Float> entry : accessory.getAttributes().entrySet())
 			{
-				String value = String.valueOf(entry.getValue().intValue());
-				if(entry.getValue() < 0) value = TextFormatting.RED + value;
-				else value = TextFormatting.BLUE + "+" + value;
-				
+				String value = EnumQuality.getColorValue(entry.getValue()) + String.valueOf(entry.getValue().intValue());
+				if(entry.getValue() > 0) value = TextFormatting.BLUE + "+" + value;
 				if(entry.getKey().equals("AttackSpeed") || entry.getKey().equals("MoveSpeed")) value = value + "%";
-				if(entry.getValue() != 0)event.getToolTip().add(value + " " + entry.getKey());
+				if(entry.getValue() != 0) event.getToolTip().add(" " + value + " " + entry.getKey());
 			}
 			
 			CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
@@ -379,10 +380,10 @@ public class ModEventHandler
 				
 				for(int i = 0; i < cap.getSize(); i++)
 				{
-					String value = "" + cap.getAttributeValue(i);
-					if(cap.getAttributeValue(i) > 0) value = "+" + value;
+					String value = EnumQuality.getColorValue(cap.getAttributeValue(i)) + String.valueOf(cap.getAttributeValue(i));
+					if(cap.getAttributeValue(i) > 0) value = TextFormatting.BLUE + "+" + value;
 					if(cap.getAttributeName(i).equals("MoveSpeed") || cap.getAttributeName(i).equals("AttackSpeed")) value = value + "%";
-					event.getToolTip().add(EnumQuality.getColorValue(cap.getAttributeValue(i)) + String.valueOf(value) + " " + cap.getAttributeName(i));
+					event.getToolTip().add(" " + value + " " + cap.getAttributeName(i));
 				}
 			}
 		}
@@ -400,7 +401,7 @@ public class ModEventHandler
 		if(oldStats != null && newStats != null)
 		{
 			newStats.deserializeNBT(oldStats.serializeNBT());
-			if(!newPlayer.world.isRemote) ModNetworkingManager.INSTANCE.sendTo(new CapabilityStatsPacket(oldStats.serializeNBT()), (EntityPlayerMP)newPlayer);
+			if(!newPlayer.world.isRemote) ModNetworkingManager.INSTANCE.sendTo(new CapabilityStatsPacket(newPlayer.getEntityId(), oldStats.serializeNBT()), (EntityPlayerMP)newPlayer);
 		}
 	}
 	
@@ -424,8 +425,7 @@ public class ModEventHandler
 			                ModNetworkingManager.INSTANCE.sendTo(new CapabilityWeaponPacket(slot.slotNumber, cap.serializeNBT()), player);
 			            }
 			        }
-			        
-			        if (stack.getItem() instanceof ItemArmor)
+			        else if (stack.getItem() instanceof ItemArmor)
 			        {
 			            CapabilityEquipment cap = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
 			            if (cap != null && cap.isEmpty())
@@ -434,14 +434,13 @@ public class ModEventHandler
 			                ModNetworkingManager.INSTANCE.sendTo(new CapabilityEquipmetPacket(slot.slotNumber, cap.serializeNBT()), player);
 			            }
 			        }
-			        
-			        if (stack.getItem() instanceof IAccessory)
+			        else if (stack.getItem() instanceof IAccessory)
 			        {
 			            CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
 			            if (cap != null && cap.isEmpty())
 			            {
 			                cap.randomAttribute();
-			                ModNetworkingManager.INSTANCE.sendTo(new CapabiliryAttributePacket(slot.slotNumber, cap.serializeNBT()), player);
+			                ModNetworkingManager.INSTANCE.sendTo(new CapabilityAttributePacket(slot.slotNumber, cap.serializeNBT()), player);
 			            }
 			        }
 		        }
@@ -452,26 +451,63 @@ public class ModEventHandler
 	@SubscribeEvent
 	public void onCrafted(ItemCraftedEvent event)
 	{
-	    ItemStack stack = event.crafting;
-	    if (!stack.isEmpty())
+		ItemStack item = event.crafting;
+        if(!item.isEmpty())
+        {
+	        if (item.getItem() instanceof ItemSword || item.getItem() instanceof ItemBow)
+	        {
+	            CapabilityWeapon cap = item.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
+	            if (cap != null && cap.isEmpty()) cap.randomAttribute();
+	        }
+	        else if (item.getItem() instanceof ItemArmor)
+	        {
+	            CapabilityEquipment cap = item.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+	            if (cap != null && cap.isEmpty()) cap.randomAttribute();
+	        }
+	        else if (item.getItem() instanceof IAccessory)
+	        {
+	            CapabilityAttribute cap = item.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
+	            if (cap != null && cap.isEmpty())cap.randomAttribute();
+	        }
+        }
+		
+	    if(!event.player.world.isRemote)
 	    {
-			if(stack.getItem() instanceof ItemSword || stack.getItem() instanceof ItemBow)
-			{
-				CapabilityWeapon cap = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
-				if(cap != null && cap.isEmpty()) cap.randomAttribute();
-			}
-			
-			if(stack.getItem() instanceof ItemArmor)
-			{
-				CapabilityEquipment cap = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
-				if(cap != null && cap.isEmpty()) cap.randomAttribute();
-			}
-			
-			if(stack.getItem() instanceof IAccessory)
-			{
-				CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
-				if(cap != null && cap.isEmpty()) cap.randomAttribute();
-			}
+		    EntityPlayerMP player = (EntityPlayerMP) event.player;
+		    for(Slot slot : event.player.openContainer.inventorySlots)
+		    {
+		        ItemStack stack = slot.getStack();
+		        if(!stack.isEmpty())
+		        {
+			        if (stack.getItem() instanceof ItemSword || stack.getItem() instanceof ItemBow)
+			        {
+			            CapabilityWeapon cap = stack.getCapability(CapabilityWeaponProvider.WEAPON_ATTRIBUTE_CAP, null);
+			            if (cap != null && cap.isEmpty())
+			            {
+			            	cap.randomAttribute();
+			                ModNetworkingManager.INSTANCE.sendTo(new CapabilityWeaponPacket(slot.slotNumber, cap.serializeNBT()), player);
+			            }
+			        }
+			        else if (stack.getItem() instanceof ItemArmor)
+			        {
+			            CapabilityEquipment cap = stack.getCapability(CapabilityEquipmentProvider.EQUIPMENT_ATTRIBUTE_CAP, null);
+			            if (cap != null && cap.isEmpty())
+			            {
+			            	cap.randomAttribute();
+			                ModNetworkingManager.INSTANCE.sendTo(new CapabilityEquipmetPacket(slot.slotNumber, cap.serializeNBT()), player);
+			            }
+			        }
+			        else if (stack.getItem() instanceof IAccessory)
+			        {
+			            CapabilityAttribute cap = stack.getCapability(CapabilityAttributeProvider.ACCESSORY_ATTRIBUTES_CAP, null);
+			            if (cap != null && cap.isEmpty())
+			            {
+			            	cap.randomAttribute();
+			                ModNetworkingManager.INSTANCE.sendTo(new CapabilityAttributePacket(slot.slotNumber, cap.serializeNBT()), player);
+			            }
+			        }
+		        }
+		    }
 	    }
 	}
 }

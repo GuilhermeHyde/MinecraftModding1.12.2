@@ -53,27 +53,27 @@ public class CapabilityStats implements ICapabilityMod<NBTTagCompound>
 	}
 	
 	@Override
-	public void setValue(String name, float value)
+	public void setValue(String name, Object value)
 	{
 		switch(name)
 		{
 		case "AttackDamage":
-			this.attackDamage = value;
+			this.attackDamage = (float)value;
 			break;
 		case "CriticalDamage":
-			this.criticalDamage = value;
+			this.criticalDamage = (float)value;
 			break;
 		case "MoveSpeed":
-			this.moveSpeed = value;
+			this.moveSpeed = (float)value;
 			break;
 		case "AttackSpeed":
-			this.attackSpeed = value;
+			this.attackSpeed = (float)value;
 			break;
 		case "ArmorDefense":
-			this.armorDefense = value;
+			this.armorDefense = (float)value;
 			break;
 		case "ArmorToughness":
-			this.armorToughness = value;
+			this.armorToughness = (float)value;
 			break;
 			default:
 				return;

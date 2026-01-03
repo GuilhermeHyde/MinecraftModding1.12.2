@@ -29,12 +29,12 @@ public class CapabilityAccessoryProvider implements ICapabilitySerializable<NBTT
 	@Override
 	public NBTTagCompound serializeNBT()
 	{
-		return (NBTTagCompound)INVENTORY_ACCESSORY_CAP.getStorage().writeNBT(INVENTORY_ACCESSORY_CAP, instance, null);
+		return this.instance.serializeNBT();
 	}
 
 	@Override
 	public void deserializeNBT(NBTTagCompound nbt)
 	{
-		INVENTORY_ACCESSORY_CAP.getStorage().readNBT(INVENTORY_ACCESSORY_CAP, instance, null, nbt);
+		if(nbt != null) this.instance.deserializeNBT(nbt);
 	}
 }

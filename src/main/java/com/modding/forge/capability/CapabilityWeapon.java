@@ -8,7 +8,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.modding.forge.capability.interfaces.ICapabilityMod;
+import com.modding.forge.capability.provider.CapabilityWeaponProvider;
+import com.modding.forge.network.ModNetworkingManager;
+import com.modding.forge.network.packets.CapabilityWeaponPacket;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import scala.concurrent.forkjoin.ThreadLocalRandom;
@@ -98,18 +107,18 @@ public class CapabilityWeapon implements ICapabilityMod<NBTTagCompound>
 	}
 	
 	@Override
-	public void setValue(String id, float value)
+	public void setValue(String id, Object value)
 	{
 		switch(id)
 		{
 		case "AttackDamage":
-			this.attackDamage = value;
+			this.attackDamage = (float)value;
 			break;
 		case "CriticalDamage":
-			this.criticalDamage = value;
+			this.criticalDamage = (float)value;
 			break;
 		case "AttackSpeed":
-			this.attackSpeed = value;
+			this.attackSpeed = (float)value;
 			break;
 			default:
 				return;
